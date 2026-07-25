@@ -67,6 +67,22 @@ export default function Home() {
       >
         Property Assistant →
       </Link>
+      <Link
+        href="/leads"
+        style={{
+          marginTop: 12,
+          background: "transparent",
+          color: "#1B3A2F",
+          textDecoration: "none",
+          padding: "9px 22px",
+          borderRadius: 6,
+          fontSize: 15,
+          fontWeight: 600,
+          border: "1px solid #1B3A2F",
+        }}
+      >
+        Leads →
+      </Link>
     </main>
   );
 }

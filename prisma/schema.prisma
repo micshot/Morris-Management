@@ -70,8 +70,9 @@ enum VerificationState {
 }
 
 model Person {
-  id       String @id @default(cuid())
-  agencyId String
+  id             String  @id @default(cuid())
+  agencyId       String
+  conversationId String? // ties an anonymous chat session to a lead record
 
   name             String?
   phone            String?
@@ -98,6 +99,7 @@ model Person {
   @@index([agencyId])
   @@index([agencyId, phone])
   @@index([agencyId, email])
+  @@index([agencyId, conversationId])
   @@map("people")
 }
 
