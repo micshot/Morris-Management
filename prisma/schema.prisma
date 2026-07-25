@@ -1,6 +1,8 @@
 // Morris Management — core data model (v0.1 foundation)
 // The spine: every record belongs to exactly one Agency (the tenant boundary).
 // Isolation is enforced in application queries by always scoping to agencyId.
+//
+// Prisma 7: the datasource `url` lives in prisma.config.ts, not here.
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +10,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 /// The tenant boundary. Every other record hangs off exactly one Agency.
@@ -25,9 +26,8 @@ model Agency {
   @@map("agencies")
 }
 
-/// A user who works properties. Belongs to one agency.
 enum AgentRole {
-  ADMIN // broker / owner
+  ADMIN
   AGENT
 }
 
@@ -43,13 +43,11 @@ model Agent {
   agency     Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   properties Property[]
 
-  // Email unique within an agency, not globally.
   @@unique([agencyId, email])
   @@index([agencyId])
   @@map("agents")
 }
 
-/// A buyer / lead. Belongs to one agency.
 enum LeadRole {
   BUYER
   SELLER
@@ -66,23 +64,21 @@ enum LeadTemperature {
 }
 
 enum VerificationState {
-  NONE // new person, never needed verification
+  NONE
   VERIFIED
-  FLAGGED // possible existing match, failed verification — for agent cleanup
+  FLAGGED
 }
 
 model Person {
   id       String @id @default(cuid())
   agencyId String
 
-  // Contact
-  name           String?
-  phone          String?
-  email          String?
+  name             String?
+  phone            String?
+  email            String?
   preferredChannel String?
 
-  // Qualification (the nine fields)
-  role            LeadRole        @default(UNKNOWN)
+  role            LeadRole @default(UNKNOWN)
   propertyType    String?
   location        String?
   budget          String?
@@ -90,10 +86,9 @@ model Person {
   timeline        String?
   source          String?
 
-  // Scoring & verification
-  temperature       LeadTemperature   @default(UNSET)
-  verificationState VerificationState @default(NONE)
-  failedVerifications Int             @default(0)
+  temperature         LeadTemperature   @default(UNSET)
+  verificationState   VerificationState @default(NONE)
+  failedVerifications Int               @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,23 +101,22 @@ model Person {
   @@map("people")
 }
 
-/// A property listing — the source of truth the AI reads from.
 enum PropertyReviewStatus {
-  DRAFT // AI-extracted or manual, not yet confirmed
-  LIVE // agent-reviewed, safe for the AI to quote
+  DRAFT
+  LIVE
 }
 
 model Property {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   agencyId String
-  agentId  String? // owning agent
+  agentId  String?
 
   title       String?
   location    String?
   price       String?
   rooms       String?
   sizeSqm     String?
-  description  String?
+  description String?
 
   reviewStatus PropertyReviewStatus @default(DRAFT)
 

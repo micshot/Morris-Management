@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
-// Seeds the pilot agency and its admin. Idempotent: safe to run repeatedly.
-// The pilot operates as a single agency until auth + agency onboarding is built.
 async function main() {
   const agency = await prisma.agency.upsert({
     where: { id: "pilot-agency" },
