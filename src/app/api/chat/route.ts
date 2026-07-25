@@ -29,6 +29,42 @@ export async function POST(req: NextRequest) {
 
   const agencyId = await getCurrentAgencyId();
 
+  // Returning-user verification gate. If the latest message presents contact
+  // details matching an existing lead from a DIFFERENT conversation, the AI
+  // must reveal nothing about that record until identity is proven.
+  let verificationNote = "";
+  if (conversationId) {
+    try {
+      const { findReturningCandidate, verifyClaim } = await import("@/lib/verification");
+      const claimAnthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+      const claim = await extractLead(claimAnthropic, messages);
+      if (claim && (claim.phone || claim.email)) {
+        const candidate = await findReturningCandidate(prisma, agencyId, conversationId, {
+          name: claim.name,
+          phone: claim.phone,
+          email: claim.email,
+        });
+        if (candidate) {
+          const outcome = await verifyClaim(prisma, candidate.id, {
+            name: claim.name,
+            phone: claim.phone,
+            email: claim.email,
+            detail: claim.location,
+          });
+          if (outcome.status === "challenge") {
+            verificationNote =
+              "\n\nIMPORTANT: This person may be a returning contact. Do NOT reveal or confirm any previously stored details about them (no saved name, prior properties, budget, etc.). Politely ask them to confirm their full name AND one detail from a prior conversation (such as an area or property they discussed) before continuing as if you know them. Stay neutral and friendly.";
+          } else if (outcome.status === "failed_open") {
+            verificationNote =
+              "\n\nIMPORTANT: Treat this as a brand-new inquiry. Do NOT reference or confirm any previously stored details. Just help them fresh as a new buyer.";
+          }
+        }
+      }
+    } catch {
+      // verification is best-effort; never block the chat
+    }
+  }
+
   const properties = await prisma.property.findMany({
     where: { agencyId, reviewStatus: "LIVE" },
     orderBy: { updatedAt: "desc" },
@@ -58,7 +94,7 @@ Your job:
 - Be warm, concise, and helpful. Move a genuinely interested buyer toward booking a short intro call with the agent.
 
 Available properties (these are the only ones you may discuss):
-${propertyContext}`;
+${propertyContext}${verificationNote}`;
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
