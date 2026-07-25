@@ -3,7 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
 // List bookings for the agency (agent-facing), soonest first.
+// Realtor-only: exposes lead contact data, so it requires a valid session.
 export async function GET() {
+  const { getSession } = await import("@/lib/auth");
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const { prisma } = await import("@/lib/db");
   const { getCurrentAgencyId } = await import("@/lib/tenant");
   const agencyId = await getCurrentAgencyId();

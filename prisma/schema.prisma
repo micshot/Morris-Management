@@ -35,9 +35,10 @@ enum AgentRole {
 model Agent {
   id        String    @id @default(cuid())
   agencyId  String
-  name      String
-  email     String
-  role      AgentRole @default(AGENT)
+  name         String
+  email        String
+  passwordHash String?  // set when the realtor has login access
+  role         AgentRole @default(AGENT)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
