@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main
@@ -33,9 +35,23 @@ export default function Home() {
       <p style={{ color: "#24443A", fontSize: "1.1rem", margin: "0 0 0.25rem" }}>
         AI-Native Real Estate Agency Operations Platform
       </p>
-      <p style={{ color: "#6B7A70", fontSize: "0.9rem", margin: 0 }}>
+      <p style={{ color: "#6B7A70", fontSize: "0.9rem", margin: "0 0 1.5rem" }}>
         Foundation v0.1 · running
       </p>
+      <Link
+        href="/properties"
+        style={{
+          background: "#1B3A2F",
+          color: "#F7F5EF",
+          textDecoration: "none",
+          padding: "10px 22px",
+          borderRadius: 6,
+          fontSize: 15,
+          fontWeight: 600,
+        }}
+      >
+        Properties →
+      </Link>
     </main>
   );
 }
