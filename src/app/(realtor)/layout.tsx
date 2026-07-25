@@ -35,7 +35,7 @@ export default function RealtorLayout({ children }: { children: React.ReactNode 
         }}
       >
         <div style={{ padding: "22px 20px 18px", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
-          <div style={{ fontFamily: "var(--font-fraunces), serif", fontSize: 17, fontWeight: 600, color: "#fff", letterSpacing: "-.01em" }}>
+          <div style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: "#fff", letterSpacing: "-.01em" }}>
             Morris <span style={{ color: "var(--gold-soft)" }}>Management</span>
           </div>
           <div style={{ fontSize: 11, color: "#7f8c83", marginTop: 2, letterSpacing: ".08em", textTransform: "uppercase" }}>

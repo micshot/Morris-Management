@@ -98,8 +98,9 @@ model Person {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agency   Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   bookings Booking[]
+  events   LeadEvent[]
 
   @@index([agencyId])
   @@index([agencyId, phone])
@@ -188,4 +189,20 @@ model PropertyImage {
 
   @@index([propertyId])
   @@map("property_images")
+}
+
+/// Timeline of everything that happened to a lead - captures, edits, bookings.
+model LeadEvent {
+  id       String   @id @default(cuid())
+  agencyId String
+  personId String
+  type     String   // "captured" | "updated" | "booking" | "verified" | "flagged" | "note"
+  detail   String?  // human-readable description
+  createdAt DateTime @default(now())
+
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@index([personId, createdAt])
+  @@index([agencyId])
+  @@map("lead_events")
 }

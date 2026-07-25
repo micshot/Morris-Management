@@ -16,6 +16,7 @@ export async function GET() {
     where: { agencyId },
     orderBy: { updatedAt: "desc" },
     take: 500,
+    include: { events: { orderBy: { createdAt: "desc" }, take: 20 } },
   });
   return NextResponse.json({ people });
 }
@@ -42,6 +43,9 @@ export async function POST(req: NextRequest) {
       location: str(body.location),
       source: str(body.source) ?? "manual",
     },
+  });
+  await prisma.leadEvent.create({
+    data: { agencyId, personId: person.id, type: "captured", detail: "Added manually by agent" },
   });
   return NextResponse.json({ person }, { status: 201 });
 }

@@ -58,7 +58,7 @@ export default function Dashboard() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
         {stats.map((s) => (
           <div key={s.label} className="panel" style={{ padding: "18px 20px" }}>
-            <div className="mono" style={{ fontSize: 32, fontFamily: "var(--font-fraunces),serif", fontWeight: 600, color: "var(--forest)", lineHeight: 1 }}>{s.value}</div>
+            <div className="mono" style={{ fontSize: 32, fontFamily: 'Fraunces, serif', fontWeight: 600, color: "var(--forest)", lineHeight: 1 }}>{s.value}</div>
             <div className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{s.label}</div>
           </div>
         ))}

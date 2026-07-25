@@ -72,5 +72,14 @@ export async function POST(req: NextRequest) {
     data: { agencyId, personId, startsAt, durationMinutes: 15, status: "REQUESTED" },
   });
 
+  await prisma.leadEvent.create({
+    data: {
+      agencyId,
+      personId,
+      type: "booking",
+      detail: `Intro call requested for ${startsAt.toISOString()}`,
+    },
+  });
+
   return NextResponse.json({ booking }, { status: 201 });
 }

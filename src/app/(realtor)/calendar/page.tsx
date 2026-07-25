@@ -53,7 +53,7 @@ export default function CalendarPage() {
         <div><div className="eyebrow">Schedule</div><h1 style={{ fontSize: 30, marginTop: 4 }}>Calendar</h1></div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <button className="btn btn-ghost btn-sm" onClick={() => setCursor(new Date(year, month - 1, 1))}>←</button>
-          <span style={{ fontFamily: "var(--font-fraunces),serif", fontSize: 17, fontWeight: 600, color: "var(--forest)", minWidth: 150, textAlign: "center" }}>{MONTHS[month]} {year}</span>
+          <span style={{ fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 600, color: "var(--forest)", minWidth: 150, textAlign: "center" }}>{MONTHS[month]} {year}</span>
           <button className="btn btn-ghost btn-sm" onClick={() => setCursor(new Date(year, month + 1, 1))}>→</button>
           <button className="btn btn-ghost btn-sm" style={{ marginLeft: 6 }} onClick={() => { const d = new Date(); setCursor(new Date(d.getFullYear(), d.getMonth(), 1)); }}>Today</button>
         </div>

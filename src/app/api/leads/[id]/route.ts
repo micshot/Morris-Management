@@ -39,6 +39,13 @@ export async function PATCH(
   if (typeof body.temperature === "string" && temps.includes(body.temperature)) data.temperature = body.temperature;
 
   const person = await prisma.person.update({ where: { id: existing.id }, data });
+
+  const changed = Object.keys(data).filter((k) => (data as Record<string, unknown>)[k] !== (existing as unknown as Record<string, unknown>)[k]);
+  if (changed.length > 0) {
+    await prisma.leadEvent.create({
+      data: { agencyId, personId: existing.id, type: "updated", detail: `Agent edited ${changed.join(", ")}` },
+    });
+  }
   return NextResponse.json({ person });
 }
 

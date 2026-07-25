@@ -17,9 +17,18 @@ export default function ChatPage() {
   const [slots, setSlots] = useState<string[]>([]);
   const [showSlots, setShowSlots] = useState(false);
   const [booked, setBooked] = useState<string | null>(null);
-  const convId = useRef<string>(
-    typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())
-  );
+  const convId = useRef<string>("");
+  if (!convId.current && typeof window !== "undefined") {
+    // Persist the conversation across reloads so lead capture and bookings
+    // always attach to the same person within a browser session.
+    const KEY = "mm_conv_id";
+    let v = sessionStorage.getItem(KEY);
+    if (!v) {
+      v = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+      sessionStorage.setItem(KEY, v);
+    }
+    convId.current = v;
+  }
   const endRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

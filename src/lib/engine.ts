@@ -117,8 +117,26 @@ ${propertyContext}${verificationNote}`;
           source: lead.source ?? existing?.source ?? source,
           temperature: lead.temperature,
         };
-        if (existing) await prisma.person.update({ where: { id: existing.id }, data });
-        else await prisma.person.create({ data: { agencyId, conversationId, ...data } });
+        if (existing) {
+          await prisma.person.update({ where: { id: existing.id }, data });
+          // Log meaningful changes to the lead's history.
+          const changes: string[] = [];
+          for (const k of ["name","phone","email","location","budget","timeline","temperature"] as const) {
+            const before = (existing as Record<string, unknown>)[k];
+            const after = (data as Record<string, unknown>)[k];
+            if (after && after !== before) changes.push(`${k}: ${String(after)}`);
+          }
+          if (changes.length > 0) {
+            await prisma.leadEvent.create({
+              data: { agencyId, personId: existing.id, type: "updated", detail: `AI learned - ${changes.join(", ")}` },
+            });
+          }
+        } else {
+          const created = await prisma.person.create({ data: { agencyId, conversationId, ...data } });
+          await prisma.leadEvent.create({
+            data: { agencyId, personId: created.id, type: "captured", detail: `Captured from ${source}${data.name ? ` as ${data.name}` : ""}` },
+          });
+        }
       }
     } catch {
       /* best-effort */
