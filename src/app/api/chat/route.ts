@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       ? "There are currently no available properties in the system."
       : properties
           .map(
-            (p) =>
+            (p: (typeof properties)[number]) =>
               `- ${p.title ?? "Untitled"}${p.location ? `, ${p.location}` : ""}` +
               `${p.price ? `, ${p.price}` : ""}${p.rooms ? `, ${p.rooms} rooms` : ""}` +
               `${p.sizeSqm ? `, ${p.sizeSqm} sqm` : ""}` +
@@ -66,8 +66,8 @@ ${propertyContext}`;
     });
 
     const text = response.content
-      .filter((b): b is { type: "text"; text: string } => b.type === "text")
-      .map((b) => b.text)
+      .map((b) => (b.type === "text" ? b.text : ""))
+      .filter(Boolean)
       .join("\n");
 
     return NextResponse.json({ reply: text });
