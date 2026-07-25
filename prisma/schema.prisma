@@ -22,6 +22,7 @@ model Agency {
   agents     Agent[]
   people     Person[]
   properties Property[]
+  bookings   Booking[]
 
   @@map("agencies")
 }
@@ -42,6 +43,7 @@ model Agent {
 
   agency     Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   properties Property[]
+  bookings   Booking[]
 
   @@unique([agencyId, email])
   @@index([agencyId])
@@ -94,7 +96,8 @@ model Person {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bookings Booking[]
 
   @@index([agencyId])
   @@index([agencyId, phone])
@@ -131,4 +134,39 @@ model Property {
   @@index([agencyId])
   @@index([agencyId, agentId])
   @@map("properties")
+}
+
+enum BookingStatus {
+  REQUESTED
+  CONFIRMED
+  CANCELLED
+}
+
+/// A 15-minute intro call between a lead and an agent.
+/// Calendar sync (Google/Outlook only; never Apple) plugs in at the
+/// externalEventId seam without changing the rest of the model.
+model Booking {
+  id       String @id @default(cuid())
+  agencyId String
+  personId String
+  agentId  String?
+
+  startsAt DateTime
+  durationMinutes Int @default(15)
+  status   BookingStatus @default(REQUESTED)
+
+  externalCalendar String? // "google" | "outlook"
+  externalEventId  String? // id in the agent's calendar once synced
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency Agency  @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  person Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
+  agent  Agent?  @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId])
+  @@index([agencyId, agentId])
+  @@index([personId])
+  @@map("bookings")
 }
