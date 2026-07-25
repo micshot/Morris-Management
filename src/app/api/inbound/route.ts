@@ -6,13 +6,12 @@ export const dynamic = "force-dynamic";
 // API, SMS, web form) posts a normalised message here and gets the assistant's
 // reply, using the SAME engine and lead capture as the web chat. The channel
 // provides a stable per-person key (e.g. phone number) used as conversationId.
-//
-// Provider-specific verification/signature handling is layered on per channel
-// when its credentials are configured; this is the shared core.
 export async function POST(req: NextRequest) {
+  const { runConversation } = await import("@/lib/engine");
+
   let body: {
     channel?: string;
-    from?: string; // stable sender id for the channel (phone, etc.)
+    from?: string;
     text?: string;
     history?: { role: "user" | "assistant"; content: string }[];
   };
@@ -29,20 +28,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "from and text required" }, { status: 400 });
   }
 
-  // Deterministic conversation id per channel+sender so the same person maps to
-  // one lead across messages.
   const conversationId = `${channel}:${from}`;
   const history = Array.isArray(body.history) ? body.history : [];
   const messages = [...history, { role: "user" as const, content: text }];
 
-  // Reuse the web chat engine by calling it internally.
-  const origin = req.nextUrl.origin;
-  const res = await fetch(`${origin}/api/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages, conversationId, source: channel }),
-  });
-  const data = await res.json();
-
-  return NextResponse.json({ reply: data.reply ?? null, conversationId });
+  const result = await runConversation(messages, conversationId, channel);
+  if ("error" in result) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
+  }
+  return NextResponse.json({ reply: result.reply, conversationId });
 }
