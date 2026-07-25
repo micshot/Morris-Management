@@ -52,6 +52,21 @@ export default function Home() {
       >
         Properties →
       </Link>
+      <Link
+        href="/chat"
+        style={{
+          marginTop: 12,
+          background: "#A88532",
+          color: "#fff",
+          textDecoration: "none",
+          padding: "10px 22px",
+          borderRadius: 6,
+          fontSize: 15,
+          fontWeight: 600,
+        }}
+      >
+        Property Assistant →
+      </Link>
     </main>
   );
 }
