@@ -6,7 +6,7 @@ import { jwtVerify } from "jose";
 // - Realtor-only: "/dashboard", "/leads", "/bookings", "/properties".
 // Non-logged-in visitors to a realtor page are redirected to /login.
 
-const REALTOR_PAGES = ["/dashboard", "/leads", "/bookings", "/properties"];
+const REALTOR_PAGES = ["/dashboard", "/leads", "/bookings", "/properties", "/calendar"];
 
 function secret(): Uint8Array {
   const s =
@@ -41,5 +41,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/leads/:path*", "/bookings/:path*", "/properties/:path*"],
+  matcher: ["/dashboard/:path*", "/leads/:path*", "/bookings/:path*", "/properties/:path*", "/calendar/:path*"],
 };

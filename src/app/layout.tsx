@@ -1,26 +1,29 @@
-export const metadata = {
+import type { Metadata } from "next";
+import { Fraunces, Inter } from "next/font/google";
+import "./globals.css";
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-fraunces",
+  display: "swap",
+});
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
   title: "Morris Management",
   description: "AI-native real estate agency operations platform",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body
-        style={{
-          margin: 0,
-          fontFamily:
-            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-          background: "#F7F5EF",
-          color: "#1A1D1B",
-        }}
-      >
-        {children}
-      </body>
+    <html lang="en" className={`${fraunces.variable} ${inter.variable}`}>
+      <body>{children}</body>
     </html>
   );
 }

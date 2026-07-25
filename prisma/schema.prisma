@@ -93,6 +93,7 @@ model Person {
   temperature         LeadTemperature   @default(UNSET)
   verificationState   VerificationState @default(NONE)
   failedVerifications Int               @default(0)
+  notes               String?           // agent's private notes on this lead
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,6 +132,7 @@ model Property {
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agent  Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  images PropertyImage[]
 
   @@index([agencyId])
   @@index([agencyId, agentId])
@@ -170,4 +172,20 @@ model Booking {
   @@index([agencyId, agentId])
   @@index([personId])
   @@map("bookings")
+}
+
+/// An image attached to a property (photo, floor plan). Stored inline as a data
+/// URL for the pilot; swap to object storage (R2/S3) by changing only `url`.
+model PropertyImage {
+  id         String  @id @default(cuid())
+  propertyId String
+  url        String  @db.Text   // data URL or external URL
+  label      String?            // e.g. "Floor plan", "Kitchen"
+  kind       String  @default("photo") // "photo" | "floorplan"
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@map("property_images")
 }
