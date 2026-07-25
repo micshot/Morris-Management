@@ -1,0 +1,138 @@
+// Morris Management — core data model (v0.1 foundation)
+// The spine: every record belongs to exactly one Agency (the tenant boundary).
+// Isolation is enforced in application queries by always scoping to agencyId.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The tenant boundary. Every other record hangs off exactly one Agency.
+model Agency {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agents     Agent[]
+  people     Person[]
+  properties Property[]
+
+  @@map("agencies")
+}
+
+/// A user who works properties. Belongs to one agency.
+enum AgentRole {
+  ADMIN // broker / owner
+  AGENT
+}
+
+model Agent {
+  id        String    @id @default(cuid())
+  agencyId  String
+  name      String
+  email     String
+  role      AgentRole @default(AGENT)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  agency     Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  properties Property[]
+
+  // Email unique within an agency, not globally.
+  @@unique([agencyId, email])
+  @@index([agencyId])
+  @@map("agents")
+}
+
+/// A buyer / lead. Belongs to one agency.
+enum LeadRole {
+  BUYER
+  SELLER
+  RENTER
+  INVESTOR
+  UNKNOWN
+}
+
+enum LeadTemperature {
+  HOT
+  WARM
+  COLD
+  UNSET
+}
+
+enum VerificationState {
+  NONE // new person, never needed verification
+  VERIFIED
+  FLAGGED // possible existing match, failed verification — for agent cleanup
+}
+
+model Person {
+  id       String @id @default(cuid())
+  agencyId String
+
+  // Contact
+  name           String?
+  phone          String?
+  email          String?
+  preferredChannel String?
+
+  // Qualification (the nine fields)
+  role            LeadRole        @default(UNKNOWN)
+  propertyType    String?
+  location        String?
+  budget          String?
+  financingStatus String?
+  timeline        String?
+  source          String?
+
+  // Scoring & verification
+  temperature       LeadTemperature   @default(UNSET)
+  verificationState VerificationState @default(NONE)
+  failedVerifications Int             @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([agencyId, phone])
+  @@index([agencyId, email])
+  @@map("people")
+}
+
+/// A property listing — the source of truth the AI reads from.
+enum PropertyReviewStatus {
+  DRAFT // AI-extracted or manual, not yet confirmed
+  LIVE // agent-reviewed, safe for the AI to quote
+}
+
+model Property {
+  id       String @id @default(cuid())
+  agencyId String
+  agentId  String? // owning agent
+
+  title       String?
+  location    String?
+  price       String?
+  rooms       String?
+  sizeSqm     String?
+  description  String?
+
+  reviewStatus PropertyReviewStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agent  Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId])
+  @@index([agencyId, agentId])
+  @@map("properties")
+}
