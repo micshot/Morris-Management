@@ -2,37 +2,18 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        padding: "2rem",
-        textAlign: "center",
-      }}
-    >
-      <div style={{ borderBottom: "3px solid #A88532", paddingBottom: "1rem", marginBottom: "1rem" }}>
-        <h1 style={{ color: "#1B3A2F", fontSize: "2.5rem", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
-          MORRIS MANAGEMENT
-        </h1>
-      </div>
-      <p style={{ color: "#24443A", fontSize: "1.1rem", margin: "0 0 1.5rem" }}>
-        Find your next home
+    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center" }}>
+      <div className="eyebrow" style={{ marginBottom: 10 }}>Real estate, run by intelligence</div>
+      <h1 style={{ fontSize: 52, lineHeight: 1.05, letterSpacing: "-.02em", maxWidth: 560 }}>
+        Morris <span style={{ color: "var(--gold-soft)" }}>Management</span>
+      </h1>
+      <p className="muted" style={{ fontSize: 16, margin: "16px 0 30px", maxWidth: 420 }}>
+        Talk to our assistant about available properties, or book a 15-minute intro call with an agent.
       </p>
-      <Link
-        href="/chat"
-        style={{ background: "#1B3A2F", color: "#F7F5EF", textDecoration: "none", padding: "12px 26px", borderRadius: 6, fontSize: 16, fontWeight: 600 }}
-      >
-        Chat with our assistant →
-      </Link>
-      <Link
-        href="/login"
-        style={{ marginTop: 28, color: "#6B7A70", textDecoration: "none", fontSize: 13 }}
-      >
-        Realtor sign in
-      </Link>
+      <div style={{ display: "flex", gap: 12 }}>
+        <Link href="/chat" className="btn btn-gold" style={{ padding: "12px 26px", fontSize: 15 }}>Chat with our assistant →</Link>
+      </div>
+      <Link href="/login" style={{ marginTop: 34, color: "var(--muted)", fontSize: 13 }}>Realtor sign in</Link>
     </main>
   );
 }

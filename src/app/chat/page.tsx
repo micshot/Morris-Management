@@ -4,135 +4,95 @@ import { useState, useRef, useEffect } from "react";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const FOREST = "#1B3A2F";
-const GOLD = "#A88532";
-const IVORY = "#F7F5EF";
-const SAGE = "#6B7A70";
-const LINE = "#D6DDD4";
-
 export default function ChatPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [slots, setSlots] = useState<string[]>([]);
   const [showSlots, setShowSlots] = useState(false);
-  const [booked, setBooked] = useState<string | null>(null);
   const convId = useRef<string>("");
   if (!convId.current && typeof window !== "undefined") {
-    // Persist the conversation across reloads so lead capture and bookings
-    // always attach to the same person within a browser session.
     const KEY = "mm_conv_id";
     let v = sessionStorage.getItem(KEY);
-    if (!v) {
-      v = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
-      sessionStorage.setItem(KEY, v);
-    }
+    if (!v) { v = crypto.randomUUID ? crypto.randomUUID() : String(Date.now()); sessionStorage.setItem(KEY, v); }
     convId.current = v;
   }
   const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading, showSlots]);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading, showSlots]);
 
   async function send() {
     const text = input.trim();
     if (!text || loading) return;
     const next = [...messages, { role: "user" as const, content: text }];
-    setMessages(next);
-    setInput("");
-    setLoading(true);
+    setMessages(next); setInput(""); setLoading(true);
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next, conversationId: convId.current }),
-      });
+      const res = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: next, conversationId: convId.current }) });
       const data = await res.json();
       setMessages([...next, { role: "assistant", content: data.reply ?? data.error ?? "Something went wrong." }]);
-    } catch {
-      setMessages([...next, { role: "assistant", content: "Connection error." }]);
-    } finally {
-      setLoading(false);
-    }
+    } catch { setMessages([...next, { role: "assistant", content: "Connection error." }]); }
+    finally { setLoading(false); }
   }
 
   async function openSlots() {
     setShowSlots(true);
-    try {
-      const res = await fetch("/api/slots");
-      const data = await res.json();
-      setSlots(data.slots ?? []);
-    } catch {
-      setSlots([]);
-    }
+    try { const d = await (await fetch("/api/slots")).json(); setSlots(d.slots ?? []); } catch { setSlots([]); }
   }
-
   async function book(startsAt: string) {
-    try {
-      const res = await fetch("/api/bookings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversationId: convId.current, startsAt }),
-      });
-      if (res.ok) {
-        setBooked(startsAt);
-        setShowSlots(false);
-        setMessages((m) => [
-          ...m,
-          { role: "assistant", content: `Your intro call is booked for ${new Date(startsAt).toLocaleString()}. An agent will be in touch to confirm.` },
-        ]);
-      }
-    } catch {
-      /* ignore */
+    const res = await fetch("/api/bookings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ conversationId: convId.current, startsAt }) });
+    if (res.ok) {
+      setShowSlots(false);
+      setMessages((m) => [...m, { role: "assistant", content: `Your intro call is booked for ${new Date(startsAt).toLocaleString()}. An agent will be in touch to confirm.` }]);
     }
   }
 
   return (
-    <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1.25rem", display: "flex", flexDirection: "column", height: "100vh", boxSizing: "border-box" }}>
-      <div style={{ borderBottom: `2px solid ${GOLD}`, paddingBottom: 12, marginBottom: 16, display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+    <main style={{ maxWidth: 760, margin: "0 auto", padding: "26px 20px", display: "flex", flexDirection: "column", height: "100vh", boxSizing: "border-box" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: "1px solid var(--line-strong)", paddingBottom: 14, marginBottom: 18 }}>
         <div>
-          <h1 style={{ color: FOREST, fontSize: 22, fontWeight: 800, margin: 0 }}>Property Assistant</h1>
-          <p style={{ color: SAGE, fontSize: 13, margin: "4px 0 0" }}>Ask about available properties.</p>
+          <div className="eyebrow">Morris Management</div>
+          <h1 style={{ fontSize: 26, marginTop: 3 }}>Property Assistant</h1>
         </div>
-        <button onClick={openSlots} style={{ background: GOLD, color: "#fff", border: "none", borderRadius: 8, padding: "8px 14px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
-          Book a call
-        </button>
+        <button className="btn btn-gold" onClick={openSlots}>Book a call</button>
       </div>
 
       <div style={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 10, paddingBottom: 12 }}>
         {messages.length === 0 && !showSlots && (
-          <p style={{ color: SAGE, fontSize: 14 }}>Try: &ldquo;What do you have in Modi&rsquo;in?&rdquo;</p>
+          <div className="panel" style={{ padding: 18 }}>
+            <p className="muted" style={{ margin: 0 }}>Ask about available properties — areas, prices, rooms. Try: <span style={{ color: "var(--gold-soft)" }}>&ldquo;What do you have in Modi&rsquo;in?&rdquo;</span></p>
+          </div>
         )}
         {messages.map((m, i) => (
-          <div key={i} style={{ alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "80%", background: m.role === "user" ? FOREST : "#fff", color: m.role === "user" ? IVORY : "#1A1D1B", border: m.role === "user" ? "none" : `1px solid ${LINE}`, borderRadius: 10, padding: "9px 13px", fontSize: 14, whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
-            {m.content}
-          </div>
+          <div key={i} style={{
+            alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "82%",
+            background: m.role === "user" ? "var(--gold)" : "var(--surface)",
+            color: m.role === "user" ? "#101a16" : "var(--text)",
+            border: m.role === "user" ? "none" : "1px solid var(--line-strong)",
+            borderRadius: 12, padding: "10px 14px", fontSize: 14, whiteSpace: "pre-wrap", lineHeight: 1.5,
+            fontWeight: m.role === "user" ? 500 : 400,
+          }}>{m.content}</div>
         ))}
         {showSlots && (
-          <div style={{ background: "#fff", border: `1px solid ${LINE}`, borderRadius: 10, padding: 14 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: FOREST, marginBottom: 8 }}>Pick a 15-minute intro call:</div>
-            {slots.length === 0 ? (
-              <p style={{ color: SAGE, fontSize: 13 }}>Loading times…</p>
-            ) : (
+          <div className="panel" style={{ padding: 16 }}>
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--forest)", marginBottom: 10 }}>Pick a 15-minute intro call:</div>
+            {slots.length === 0 ? <p className="muted" style={{ fontSize: 13 }}>Loading times…</p> : (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {slots.map((s) => (
-                  <button key={s} onClick={() => book(s)} style={{ background: IVORY, color: FOREST, border: `1px solid ${LINE}`, borderRadius: 6, padding: "6px 10px", fontSize: 12, cursor: "pointer" }}>
+                  <button key={s} className="btn btn-ghost btn-sm" onClick={() => book(s)}>
                     {new Date(s).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric" })}
                   </button>
                 ))}
               </div>
             )}
-            <button onClick={() => setShowSlots(false)} style={{ marginTop: 10, background: "transparent", color: SAGE, border: "none", fontSize: 12, cursor: "pointer" }}>Cancel</button>
+            <button onClick={() => setShowSlots(false)} style={{ marginTop: 10, background: "transparent", color: "var(--muted)", border: "none", fontSize: 12, cursor: "pointer", padding: 0 }}>Cancel</button>
           </div>
         )}
-        {loading && <div style={{ alignSelf: "flex-start", color: SAGE, fontSize: 14, padding: "9px 13px" }}>…</div>}
+        {loading && <div className="muted" style={{ alignSelf: "flex-start", fontSize: 14, padding: "8px 12px" }}>…</div>}
         <div ref={endRef} />
       </div>
 
-      <div style={{ display: "flex", gap: 8, paddingTop: 8, borderTop: `1px solid ${LINE}` }}>
-        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type a message…" style={{ flex: 1, padding: "10px 12px", border: `1px solid ${LINE}`, borderRadius: 8, fontSize: 14, color: "#1A1D1B" }} />
-        <button onClick={send} disabled={loading} style={{ background: FOREST, color: IVORY, border: "none", borderRadius: 8, padding: "0 18px", fontSize: 14, fontWeight: 600, cursor: loading ? "default" : "pointer", opacity: loading ? 0.6 : 1 }}>Send</button>
+      <div style={{ display: "flex", gap: 8, paddingTop: 12, borderTop: "1px solid var(--line-strong)" }}>
+        <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type a message…" />
+        <button className="btn btn-gold" onClick={send} disabled={loading}>Send</button>
       </div>
     </main>
   );

@@ -26,6 +26,7 @@ export default function RealtorLayout({ children }: { children: React.ReactNode 
           width: "var(--sidebar-w)",
           background: "var(--ink)",
           color: "#cdd6cf",
+          borderRight: "1px solid var(--line-strong)",
           display: "flex",
           flexDirection: "column",
           position: "sticky",
