@@ -10,6 +10,18 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [slots, setSlots] = useState<string[]>([]);
   const [showSlots, setShowSlots] = useState(false);
+  const [noticeDismissed, setNoticeDismissed] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && sessionStorage.getItem("mm_notice_ack") === "1") {
+      setNoticeDismissed(true);
+    }
+  }, []);
+
+  function ackNotice() {
+    setNoticeDismissed(true);
+    try { sessionStorage.setItem("mm_notice_ack", "1"); } catch {}
+  }
   const convId = useRef<string>("");
   if (!convId.current && typeof window !== "undefined") {
     const KEY = "mm_conv_id";
@@ -89,6 +101,17 @@ export default function ChatPage() {
         {loading && <div className="muted" style={{ alignSelf: "flex-start", fontSize: 14, padding: "8px 12px" }}>…</div>}
         <div ref={endRef} />
       </div>
+
+      {messages.length > 0 && !noticeDismissed && (
+        <div className="privacy-note">
+          <span>
+            By continuing this chat you agree that we may collect and store the details you share —
+            including your name, phone number, email and what you tell us about your property search —
+            along with technical data such as your IP address, so an agent can follow up with you.
+          </span>
+          <button onClick={ackNotice} aria-label="Dismiss notice">Got it</button>
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 8, paddingTop: 12, borderTop: "1px solid var(--line-strong)" }}>
         <input value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && send()} placeholder="Type a message…" />
