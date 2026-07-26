@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Logo from "@/components/Logo";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -21,8 +22,11 @@ export default function LoginPage() {
   return (
     <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
       <div className="panel" style={{ width: "100%", maxWidth: 380, padding: "30px 30px 26px", borderTop: "3px solid var(--gold)" }}>
-        <div className="eyebrow">Morris Management</div>
-        <h1 style={{ fontSize: 24, margin: "6px 0 22px" }}>Realtor sign in</h1>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
+          <Logo size={54} />
+        </div>
+        <div className="eyebrow" style={{ textAlign: "center" }}>Morris Management</div>
+        <h1 style={{ fontSize: 24, margin: "6px 0 22px", textAlign: "center" }}>Realtor sign in</h1>
 
         <label style={{ display: "block", fontSize: 11.5, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--muted)", marginBottom: 5 }}>Email</label>
         <input value={email} onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submit()} style={{ marginBottom: 16 }} />

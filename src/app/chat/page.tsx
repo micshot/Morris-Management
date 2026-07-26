@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Logo from "@/components/Logo";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -60,9 +61,12 @@ export default function ChatPage() {
   return (
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "26px 20px", display: "flex", flexDirection: "column", height: "100vh", boxSizing: "border-box" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: "1px solid var(--line-strong)", paddingBottom: 14, marginBottom: 18 }}>
-        <div>
-          <div className="eyebrow">Morris Management</div>
-          <h1 style={{ fontSize: 26, marginTop: 3 }}>Property Assistant</h1>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <Logo size={38} />
+          <div>
+            <div className="eyebrow">Morris Management</div>
+            <h1 style={{ fontSize: 26, marginTop: 3 }}>Property Assistant</h1>
+          </div>
         </div>
         <button className="btn btn-gold" onClick={openSlots}>Book a call</button>
       </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Logo from "@/components/Logo";
 
 const I = (d: string) => (
   <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -30,7 +31,8 @@ export default function RealtorLayout({ children }: { children: React.ReactNode 
     <div className="shell">
       <aside className="rail">
         <div className="rail-brand">
-          <span className="rail-mark">M<span style={{ color: "var(--gold-soft)" }}>M</span></span>
+          <span className="rail-logo"><Logo size={30} color="var(--gold-soft)" /></span>
+          <span className="rail-mark"><Logo size={26} ring={false} color="var(--gold-soft)" /></span>
           <span className="rail-wordmark">
             <span style={{ fontFamily: "Fraunces, serif", fontSize: 17, fontWeight: 600, color: "#fff", letterSpacing: "-.01em", display: "block" }}>
               Morris <span style={{ color: "var(--gold-soft)" }}>Management</span>

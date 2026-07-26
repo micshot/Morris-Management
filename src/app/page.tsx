@@ -1,9 +1,11 @@
 import Link from "next/link";
+import Logo from "@/components/Logo";
 
 export default function Home() {
   return (
     <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center" }}>
-      <div className="eyebrow" style={{ marginBottom: 10 }}>Real estate, run by intelligence</div>
+      <Logo size={86} />
+      <div className="eyebrow" style={{ margin: "18px 0 10px" }}>Real estate, run by intelligence</div>
       <h1 style={{ fontSize: 52, lineHeight: 1.05, letterSpacing: "-.02em", maxWidth: 560 }}>
         Morris <span style={{ color: "var(--gold-soft)" }}>Management</span>
       </h1>
