@@ -493,3 +493,27 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 
 /* Five stats fit better in a wrapping grid than a fixed four-up */
 .stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
+
+/* ===== Brand watermark =====
+   The mark, blurred and stretched behind everything. Fixed so it stays put
+   while content scrolls; pointer-events off so it never intercepts taps.
+   Pre-blurred as an asset — a CSS blur this large repaints on every scroll. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  background-image: url("/logo-bg.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 120% 120%;
+  opacity: .13;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Everything real sits above the watermark */
+body > * { position: relative; z-index: 1; }
+
+@media (max-width: 700px) {
+  /* Taller than it is wide on phones — stretch to fill without cropping out */
+  body::before { background-size: 190% 90%; opacity: .1; }
+}
