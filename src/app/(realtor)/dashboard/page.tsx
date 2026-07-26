@@ -3,16 +3,32 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import TempMark from "@/components/TempMark";
+import Icon from "@/components/Icon";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
   role: string; location: string | null; budget: string | null; timeline: string | null;
-  temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string;
+  temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string; createdAt: string;
 };
 type Booking = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null };
 type Property = { id: string; title: string | null; location: string | null; price: string | null; reviewStatus: "DRAFT" | "LIVE" };
 
 const pill = (t: string) => `pill pill-${(t || "unset").toLowerCase()}`;
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 5) return { text: "Still up", mark: "🌙" };
+  if (h < 12) return { text: "Good morning", mark: "☀️" };
+  if (h < 17) return { text: "Good afternoon", mark: "🌤️" };
+  return { text: "Good evening", mark: "🌆" };
+}
+
+function ago(iso: string) {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 3600) return `${Math.max(1, Math.floor(s / 60))}m`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h`;
+  return `${Math.floor(s / 86400)}d`;
+}
 
 export default function Dashboard() {
   const [people, setPeople] = useState<Person[]>([]);
@@ -39,49 +55,79 @@ export default function Dashboard() {
   const live = props.filter((p) => p.reviewStatus === "LIVE").length;
   const upcoming = bookings.filter((b) => b.status !== "CANCELLED").length;
 
+  const dayAgo = Date.now() - 86400000;
+  const newToday = people.filter((p) => +new Date(p.createdAt) > dayAgo).length;
+  const nextCall = bookings.filter((b) => b.status !== "CANCELLED" && +new Date(b.startsAt) > Date.now())
+    .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0];
+
+  const g = greeting();
+
   const stats = [
-    { label: "Total leads", value: people.length },
-    { label: "Hot leads", value: hot },
-    { label: "Upcoming calls", value: upcoming },
-    { label: "Live listings", value: live },
+    { icon: "users", value: people.length, label: "Total leads", spark: newToday > 0 ? `${newToday} new today` : "no new today" },
+    { icon: "flame", value: hot, label: "Hot leads", spark: hot > 0 ? "worth calling now" : "none hot yet" },
+    { icon: "phone", value: upcoming, label: "Upcoming calls", spark: nextCall ? `next in ${ago(nextCall.startsAt).replace("-", "")}` : "nothing booked" },
+    { icon: "home", value: live, label: "Live listings", spark: `${props.length} total` },
   ];
 
   return (
     <>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 22 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
         <div>
-          <div className="eyebrow">Overview</div>
-          <h1 style={{ fontSize: 30, marginTop: 4 }}>Today at a glance</h1>
+          <div className="eyebrow" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <span>{g.mark}</span> {g.text}
+          </div>
+          <h1 style={{ fontSize: 30, marginTop: 5 }}>Today at a glance</h1>
         </div>
-        <button className="btn btn-ghost" onClick={load}>Refresh</button>
+        <button className="btn btn-ghost" onClick={load}>
+          <Icon name="bolt" size={14} /> Refresh
+        </button>
       </div>
 
-      <div className="stat-grid" style={{ marginBottom: 28 }}>
+      <div className="chips">
+        <Link href="/leads" className="chip"><Icon name="plus" size={14} color="var(--gold-soft)" /> Add lead</Link>
+        <Link href="/properties" className="chip"><Icon name="home" size={14} color="var(--gold-soft)" /> New listing</Link>
+        <Link href="/calendar" className="chip"><Icon name="calendar" size={14} color="var(--gold-soft)" /> Calendar</Link>
+        <a href="/chat" target="_blank" rel="noreferrer" className="chip"><Icon name="chat" size={14} color="var(--gold-soft)" /> Preview chat</a>
+      </div>
+
+      <div className="stat-grid" style={{ marginBottom: 26 }}>
         {stats.map((s) => (
-          <div key={s.label} className="panel" style={{ padding: "18px 20px" }}>
-            <div className="mono" style={{ fontSize: 32, fontFamily: 'Fraunces, serif', fontWeight: 600, color: "var(--forest)", lineHeight: 1 }}>{s.value}</div>
-            <div className="muted" style={{ fontSize: 12.5, marginTop: 6 }}>{s.label}</div>
+          <div key={s.label} className="stat">
+            <div className="stat-top">
+              <span className="stat-badge"><Icon name={s.icon} size={15} /></span>
+            </div>
+            <div className="stat-num">{loading ? "–" : s.value}</div>
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-spark"><Icon name="sparkle" size={10} color="var(--gold-soft)" fill="var(--gold-soft)" strokeWidth={0} /> {s.spark}</div>
           </div>
         ))}
       </div>
 
       <div className="split-grid">
         <section className="panel panel-scroll">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", borderBottom: "1px solid var(--line)" }}>
-            <h3 style={{ fontSize: 15 }}>Leads · hottest first</h3>
-            <Link href="/leads" style={{ fontSize: 12.5, fontWeight: 600 }}>View all →</Link>
+          <div className="sec-head">
+            <span className="sec-title"><Icon name="users" size={16} color="var(--gold-soft)" /> Leads · hottest first</span>
+            <Link href="/leads" className="sec-link">View all <Icon name="arrow" size={13} /></Link>
           </div>
           {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : leads.length === 0 ? (
-            <p className="muted" style={{ padding: 16 }}>No leads yet. They appear here as buyers chat.</p>
+            <div className="empty">
+              <div className="empty-mark">👋</div>
+              <div className="empty-text">No leads yet. They land here the moment someone chats.</div>
+            </div>
           ) : (
             <table className="table">
-              <thead><tr><th>Name</th><th>Contact</th><th>Looking for</th></tr></thead>
+              <thead><tr><th>Name</th><th>Contact</th><th>Looking for</th><th></th></tr></thead>
               <tbody>
                 {leads.slice(0, 8).map((p) => (
                   <tr key={p.id} onClick={() => (window.location.href = "/leads")}>
-                    <td style={{ fontWeight: 600, color: "var(--forest)" }}><span style={{ display: "flex", alignItems: "center", gap: 9 }}><TempMark temp={p.temperature} size={12} withThermo />{p.name ?? "Unnamed"}</span></td>
+                    <td style={{ fontWeight: 600, color: "var(--forest)" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                        <TempMark temp={p.temperature} size={12} withThermo />{p.name ?? "Unnamed"}
+                      </span>
+                    </td>
                     <td className="muted">{[p.phone, p.email].filter(Boolean).join(" · ") || "—"}</td>
                     <td className="muted">{[p.location, p.budget].filter(Boolean).join(" · ") || "—"}</td>
+                    <td style={{ width: 22 }}><span className="row-go"><Icon name="arrow" size={13} /></span></td>
                   </tr>
                 ))}
               </tbody>
@@ -89,27 +135,46 @@ export default function Dashboard() {
           )}
         </section>
 
-        <section style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div className="panel" style={{ overflow: "hidden" }}>
-            <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--line)" }}><h3 style={{ fontSize: 15 }}>Upcoming intro calls</h3></div>
-            {bookings.length === 0 ? <p className="muted" style={{ padding: 16 }}>No calls booked.</p> : (
+        <section style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div className="panel">
+            <div className="sec-head">
+              <span className="sec-title"><Icon name="phone" size={16} color="var(--gold-soft)" /> Upcoming intro calls</span>
+            </div>
+            {bookings.length === 0 ? (
+              <div className="empty">
+                <div className="empty-mark">📞</div>
+                <div className="empty-text">No calls booked yet.</div>
+              </div>
+            ) : (
               <div>{bookings.slice(0, 5).map((b) => (
-                <div key={b.id} style={{ padding: "11px 16px", borderBottom: "1px solid var(--line)" }}>
-                  <div style={{ fontWeight: 600, fontSize: 13 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</div>
-                  <div className="muted" style={{ fontSize: 12, marginTop: 2 }}>{b.person?.name ?? b.person?.phone ?? "Unnamed"} · {b.status}</div>
+                <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: "1px solid var(--line)" }}>
+                  <span className="stat-badge" style={{ width: 26, height: 26, borderRadius: 8 }}><Icon name="clock" size={13} /></span>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</div>
+                    <div className="muted" style={{ fontSize: 12, marginTop: 1 }}>{b.person?.name ?? b.person?.phone ?? "Unnamed"} · {b.status}</div>
+                  </div>
                 </div>
               ))}</div>
             )}
           </div>
-          <div className="panel" style={{ overflow: "hidden" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", borderBottom: "1px solid var(--line)" }}>
-              <h3 style={{ fontSize: 15 }}>Listings</h3>
-              <Link href="/properties" style={{ fontSize: 12.5, fontWeight: 600 }}>Manage →</Link>
+
+          <div className="panel">
+            <div className="sec-head">
+              <span className="sec-title"><Icon name="home" size={16} color="var(--gold-soft)" /> Listings</span>
+              <Link href="/properties" className="sec-link">Manage <Icon name="arrow" size={13} /></Link>
             </div>
-            {props.length === 0 ? <p className="muted" style={{ padding: 16 }}>No listings.</p> : (
+            {props.length === 0 ? (
+              <div className="empty">
+                <div className="empty-mark">🏠</div>
+                <div className="empty-text">No listings yet.</div>
+              </div>
+            ) : (
               <div>{props.slice(0, 5).map((p) => (
-                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 16px", borderBottom: "1px solid var(--line)" }}>
-                  <div><div style={{ fontWeight: 600, fontSize: 13 }}>{p.title}</div><div className="muted" style={{ fontSize: 12 }}>{[p.location, p.price].filter(Boolean).join(" · ")}</div></div>
+                <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: "1px solid var(--line)" }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
+                    <div className="muted" style={{ fontSize: 12 }}>{[p.location, p.price].filter(Boolean).join(" · ")}</div>
+                  </div>
                   <span className={pill(p.reviewStatus)}>{p.reviewStatus}</span>
                 </div>
               ))}</div>
