@@ -75,14 +75,13 @@ export default function Dashboard() {
             <p className="muted" style={{ padding: 16 }}>No leads yet. They appear here as buyers chat.</p>
           ) : (
             <table className="table">
-              <thead><tr><th>Name</th><th>Contact</th><th>Looking for</th><th>Temp</th></tr></thead>
+              <thead><tr><th>Name</th><th>Contact</th><th>Looking for</th></tr></thead>
               <tbody>
                 {leads.slice(0, 8).map((p) => (
                   <tr key={p.id} onClick={() => (window.location.href = "/leads")}>
-                    <td style={{ fontWeight: 600, color: "var(--forest)" }}><span style={{ display: "flex", alignItems: "center", gap: 7 }}><TempMark temp={p.temperature} />{p.name ?? "Unnamed"}</span></td>
+                    <td style={{ fontWeight: 600, color: "var(--forest)" }}><span style={{ display: "flex", alignItems: "center", gap: 9 }}><TempMark temp={p.temperature} size={12} withThermo />{p.name ?? "Unnamed"}</span></td>
                     <td className="muted">{[p.phone, p.email].filter(Boolean).join(" · ") || "—"}</td>
                     <td className="muted">{[p.location, p.budget].filter(Boolean).join(" · ") || "—"}</td>
-                    <td><span className={pill(p.temperature)}>{p.temperature}</span></td>
                   </tr>
                 ))}
               </tbody>
