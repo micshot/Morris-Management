@@ -356,3 +356,39 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
   cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 0 2px; font-family: inherit;
 }
 .filter-note button:hover { color: #fff; }
+
+/* ===== Tables that stack into cards on small screens =====
+   Saves horizontal space: no side-scrolling, every field visible at once. */
+@media (max-width: 700px) {
+  .stack-table thead { display: none; }
+  .stack-table, .stack-table tbody, .stack-table tr, .stack-table td { display: block; width: 100%; }
+  .stack-table tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+  .stack-table tr:last-child { border-bottom: none; }
+  .stack-table td {
+    padding: 3px 0; border: none;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    font-size: 13px;
+  }
+  .stack-table td::before {
+    content: attr(data-label);
+    font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); flex-shrink: 0;
+  }
+  /* Lead line reads as the card title */
+  .stack-table td.cell-lead {
+    font-family: Fraunces, serif; font-size: 15px; color: var(--forest);
+    justify-content: flex-start; padding-bottom: 6px;
+  }
+  .stack-table td.cell-lead::before { content: none; }
+  /* Actions sit on their own line, right aligned */
+  .stack-table td.cell-actions {
+    justify-content: flex-end; padding-top: 9px; margin-top: 6px;
+    border-top: 1px dashed var(--line);
+  }
+  .stack-table td.cell-actions::before { content: none; }
+  /* Stacked cards don't need the scroll container */
+  .panel-scroll { overflow-x: visible; }
+}

@@ -39,17 +39,17 @@ export default function BookingsPage() {
         {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : bookings.length === 0 ? (
           <p className="muted" style={{ padding: 16 }}>No calls booked yet.</p>
         ) : (
-          <table className="table">
+          <table className="table stack-table">
             <thead><tr><th>When</th><th>Lead</th><th>Contact</th><th>Length</th><th>Status</th><th></th></tr></thead>
             <tbody>
               {bookings.map((b) => (
                 <tr key={b.id} style={{ cursor: "default" }}>
-                  <td style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
-                  <td>{b.person?.name ?? "Unnamed"}</td>
-                  <td className="muted">{[b.person?.phone, b.person?.email].filter(Boolean).join(" · ") || "—"}</td>
-                  <td className="muted mono">{b.durationMinutes} min</td>
-                  <td><span className={statusPill(b.status)}>{b.status}</span></td>
-                  <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                  <td data-label="When" className="cell-lead" style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
+                  <td data-label="Lead">{b.person?.name ?? "Unnamed"}</td>
+                  <td data-label="Contact" className="muted">{[b.person?.phone, b.person?.email].filter(Boolean).join(" · ") || "—"}</td>
+                  <td data-label="Length" className="muted mono">{b.durationMinutes} min</td>
+                  <td data-label="Status"><span className={statusPill(b.status)}>{b.status}</span></td>
+                  <td className="cell-actions" style={{ textAlign: "right", whiteSpace: "nowrap" }}>
                     {b.status !== "CONFIRMED" && <button className="btn btn-ghost btn-sm" onClick={() => setStatus(b.id, "CONFIRMED")}>Confirm</button>}
                     {b.status !== "CANCELLED" && <button className="btn btn-danger btn-sm" style={{ marginLeft: 6 }} onClick={() => setStatus(b.id, "CANCELLED")}>Cancel</button>}
                   </td>
