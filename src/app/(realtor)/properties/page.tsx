@@ -1,6 +1,7 @@
 "use client";
 
 import { withSeparators } from "@/lib/format";
+import Icon from "@/components/Icon";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 
@@ -101,8 +102,8 @@ export default function PropertiesPage() {
         <div><div className="eyebrow">Inventory</div><h1 style={{ fontSize: 30, marginTop: 4 }}>Listings</h1></div>
         <div style={{ display: "flex", gap: 8 }}>
           <input ref={fileRef} type="file" accept="application/pdf,image/*" multiple style={{ display: "none" }} onChange={(e) => onFiles(e.target.files)} />
-          <button className="btn btn-gold" onClick={() => fileRef.current?.click()}>Upload sheet / floor plan</button>
-          <button className="btn btn-ghost" onClick={() => setShowForm((s) => !s)}>{showForm ? "Hide form" : "+ Add manually"}</button>
+          <button className="btn btn-gold" onClick={() => fileRef.current?.click()}><Icon name="sparkle" size={14} /> Upload sheet</button>
+          <button className="btn btn-ghost" onClick={() => setShowForm((s) => !s)}><Icon name={showForm ? "x" : "plus"} size={14} /> {showForm ? "Hide form" : "Add manually"}</button>
         </div>
       </div>
 
@@ -112,7 +113,7 @@ export default function PropertiesPage() {
             <h3 style={{ fontSize: 16 }}>New listing {extracting && <span className="muted" style={{ fontWeight: 400, fontSize: 13 }}>· reading document…</span>}</h3>
             <span className="muted" style={{ fontSize: 12 }}>Saved as Draft until you set it Live</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+          <div className="form-grid">
             {(["title", "location", "price", "rooms", "sizeSqm"] as const).map((k) => (
               <label key={k} style={{ display: "flex", flexDirection: "column", gap: 5, gridColumn: k === "title" ? "1 / -1" : "auto" }}>
                 <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", color: "var(--muted)" }}>{k === "sizeSqm" ? "Size (sqm)" : k}</span>
@@ -146,37 +147,54 @@ export default function PropertiesPage() {
         </div>
       )}
 
-      <div className="panel panel-scroll">
-        {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : items.length === 0 ? (
-          <p className="muted" style={{ padding: 16 }}>No listings yet. Upload a sheet or add one manually.</p>
-        ) : (
-          <table className="table">
-            <thead><tr><th></th><th>Title</th><th>Location</th><th>Price</th><th>Rooms</th><th>Size</th><th>Status</th><th></th></tr></thead>
-            <tbody>
-              {items.map((p) => {
-                const cover = p.images?.[0];
-                return (
-                  <tr key={p.id} style={{ cursor: "default" }}>
-                    <td style={{ width: 52 }}>
-                      {cover ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={cover.url} alt="" style={{ width: 40, height: 40, borderRadius: 6, objectFit: "cover", border: "1px solid var(--line)" }} />
-                      ) : <div style={{ width: 40, height: 40, borderRadius: 6, background: "var(--surface-2)", border: "1px solid var(--line)" }} />}
-                    </td>
-                    <td style={{ fontWeight: 600, color: "var(--forest)" }}>{p.title}{p.images && p.images.length > 1 && <span className="muted" style={{ fontWeight: 400, fontSize: 12 }}> · {p.images.length} imgs</span>}</td>
-                    <td className="muted">{p.location || "—"}</td>
-                    <td className="muted mono">{withSeparators(p.price) || "—"}</td>
-                    <td className="muted mono">{p.rooms || "—"}</td>
-                    <td className="muted mono">{p.sizeSqm || "—"}</td>
-                    <td><span className={pill(p.reviewStatus)}>{p.reviewStatus}</span></td>
-                    <td style={{ textAlign: "right" }}><button className="btn btn-ghost btn-sm" onClick={() => toggleStatus(p)}>{p.reviewStatus === "LIVE" ? "Unpublish" : "Set live"}</button></td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {loading ? (
+        <p className="muted">Loading…</p>
+      ) : items.length === 0 ? (
+        <div className="panel">
+          <div className="empty">
+            <div className="empty-mark">🏘️</div>
+            <div className="empty-text">No listings yet. Upload a sheet or floor plan and the fields fill themselves.</div>
+          </div>
+        </div>
+      ) : (
+        <div className="prop-grid">
+          {items.map((p) => {
+            const cover = p.images?.[0];
+            return (
+              <div key={p.id} className="prop-card">
+                <div className="prop-cover">
+                  {cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={cover.url} alt={p.title ?? ""} />
+                  ) : (
+                    <div className="prop-cover-blank"><Icon name="home" size={22} color="var(--muted)" /></div>
+                  )}
+                  <span className={`pill pill-${p.reviewStatus.toLowerCase()} prop-status`}>{p.reviewStatus}</span>
+                  {p.images && p.images.length > 1 && (
+                    <span className="prop-count">{p.images.length} photos</span>
+                  )}
+                </div>
+                <div className="prop-body">
+                  <div className="prop-title">{p.title}</div>
+                  {p.location && <div className="muted" style={{ fontSize: 12.5, marginTop: 2 }}>{p.location}</div>}
+                  <div className="prop-facts">
+                    {p.price && <span className="mono">₪ {withSeparators(p.price)}</span>}
+                    {p.rooms && <span>{p.rooms} rooms</span>}
+                    {p.sizeSqm && <span>{p.sizeSqm} sqm</span>}
+                  </div>
+                </div>
+                <div className="prop-foot">
+                  <button className="btn btn-ghost btn-sm" onClick={() => toggleStatus(p)}>
+                    <Icon name={p.reviewStatus === "LIVE" ? "x" : "check"} size={12} />
+                    {p.reviewStatus === "LIVE" ? "Unpublish" : "Set live"}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
     </>
   );
 }

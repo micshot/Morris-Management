@@ -23,6 +23,7 @@ model Agency {
   people     Person[]
   properties Property[]
   bookings   Booking[]
+  viewings   Viewing[]
 
   @@map("agencies")
 }
@@ -45,6 +46,7 @@ model Agent {
   agency     Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   properties Property[]
   bookings   Booking[]
+  viewings   Viewing[]
 
   @@unique([agencyId, email])
   @@index([agencyId])
@@ -100,6 +102,7 @@ model Person {
 
   agency   Agency      @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   bookings Booking[]
+  viewings Viewing[]
   events   LeadEvent[]
 
   @@index([agencyId])
@@ -133,7 +136,8 @@ model Property {
 
   agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agent  Agent? @relation(fields: [agentId], references: [id], onDelete: SetNull)
-  images PropertyImage[]
+  images   PropertyImage[]
+  viewings Viewing[]
 
   @@index([agencyId])
   @@index([agencyId, agentId])
@@ -205,4 +209,39 @@ model LeadEvent {
   @@index([personId, createdAt])
   @@index([agencyId])
   @@map("lead_events")
+}
+
+enum ViewingStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+/// An in-person property viewing. The agent arranges these with the buyer
+/// directly; the platform tracks them. The AI never schedules a viewing.
+model Viewing {
+  id         String @id @default(cuid())
+  agencyId   String
+  personId   String
+  propertyId String?
+  agentId    String?
+
+  startsAt        DateTime
+  durationMinutes Int           @default(30)
+  status          ViewingStatus @default(SCHEDULED)
+  notes           String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  person   Person    @relation(fields: [personId], references: [id], onDelete: Cascade)
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  agent    Agent?    @relation(fields: [agentId], references: [id], onDelete: SetNull)
+
+  @@index([agencyId, startsAt])
+  @@index([personId])
+  @@index([propertyId])
+  @@map("viewings")
 }

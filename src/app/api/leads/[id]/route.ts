@@ -71,6 +71,20 @@ export async function DELETE(
     where: { personId: existing.id, status: { not: "CANCELLED" }, startsAt: { gte: new Date() } },
     orderBy: { startsAt: "asc" },
   });
+  const upcomingViewings = await prisma.viewing.count({
+    where: { personId: existing.id, status: "SCHEDULED", startsAt: { gte: new Date() } },
+  });
+  if (upcomingViewings > 0) {
+    return NextResponse.json(
+      {
+        error: `This lead has ${upcomingViewings} scheduled viewing${upcomingViewings > 1 ? "s" : ""}. Cancel ${upcomingViewings > 1 ? "them" : "it"} on the Calendar before deleting.`,
+        blockedBy: "viewings",
+        count: upcomingViewings,
+      },
+      { status: 409 }
+    );
+  }
+
   if (upcoming.length > 0) {
     const when = new Date(upcoming[0].startsAt).toLocaleString();
     return NextResponse.json(
