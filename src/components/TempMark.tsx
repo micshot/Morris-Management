@@ -9,11 +9,21 @@ const COLOR: Record<string, string> = {
   UNSET: "var(--muted)",
 };
 
-export default function TempMark({ temp, size = 11 }: { temp: string; size?: number }) {
+// `withThermo` stacks a small thermometer glyph above the dot, so the mark reads
+// as "temperature" without needing a text pill beside it.
+export default function TempMark({
+  temp,
+  size = 11,
+  withThermo = false,
+}: {
+  temp: string;
+  size?: number;
+  withThermo?: boolean;
+}) {
   const t = (temp || "UNSET").toUpperCase();
   const c = COLOR[t] ?? COLOR.UNSET;
 
-  return (
+  const dot = (
     <svg
       viewBox="0 0 12 12"
       width={size}
@@ -35,5 +45,19 @@ export default function TempMark({ temp, size = 11 }: { temp: string; size?: num
         <circle cx="6" cy="6" r="4.2" fill="none" stroke={c} strokeWidth="1.5" strokeDasharray="2 2.4" />
       )}
     </svg>
+  );
+
+  if (!withThermo) return dot;
+
+  return (
+    <span
+      style={{ display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 2, flexShrink: 0 }}
+      title={t}
+    >
+      <svg viewBox="0 0 24 24" width={size - 1} height={size - 1} fill="none" stroke={c} strokeWidth="2.1" strokeLinecap="round" aria-hidden="true" style={{ opacity: 0.75, display: "block" }}>
+        <path d="M14 14.8V4a2 2 0 1 0-4 0v10.8a4 4 0 1 0 4 0z" />
+      </svg>
+      {dot}
+    </span>
   );
 }

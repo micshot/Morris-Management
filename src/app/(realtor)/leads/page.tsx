@@ -102,14 +102,16 @@ export default function LeadsPage() {
             const lastEvent = p.events?.[0];
             return (
               <div key={p.id} className={`lead-card temp-${p.temperature.toLowerCase()}`} onClick={() => edit(p)}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                  <div>
-                    <div className="lead-name" style={{ display: "flex", alignItems: "center", gap: 7 }}><TempMark temp={p.temperature} size={12} />{p.name ?? "Unnamed lead"}</div>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 11 }}>
+                  <span style={{ paddingTop: 3 }}>
+                    <TempMark temp={p.temperature} size={13} withThermo />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <div className="lead-name">{p.name ?? "Unnamed lead"}</div>
                     <div className="lead-meta" style={{ marginTop: 2 }}>
                       Added {ago(p.createdAt)} · active {ago(p.updatedAt)}
                     </div>
                   </div>
-                  <span className={`pill pill-${p.temperature.toLowerCase()}`}>{p.temperature}</span>
                 </div>
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6, margin: "12px 0 10px" }}>
