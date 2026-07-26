@@ -206,7 +206,7 @@ input:focus, textarea:focus, select:focus {
 .rail {
   width: var(--sidebar-w); flex-shrink: 0;
   position: sticky; top: 0; height: 100vh;
-  background: var(--ink); color: #cdd6cf;
+  background: rgba(13,21,18,.88); color: #cdd6cf;
   border-right: 1px solid var(--line-strong);
   display: flex; flex-direction: column;
   transition: width .15s ease;
@@ -236,7 +236,7 @@ input:focus, textarea:focus, select:focus {
 .rail-foot { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,.08); }
 .rail-out { color: #8f9a91; font-size: 12.5px; font-weight: 600; }
 
-.shell-main { flex: 1; min-width: 0; background: var(--parchment); }
+.shell-main { flex: 1; min-width: 0; background: transparent; }
 .shell-inner { max-width: 1180px; margin: 0 auto; padding: 28px 32px 64px; }
 
 /* Responsive grids */
@@ -505,8 +505,8 @@ body::before {
   background-image: url("/logo-bg.png");
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 120% 120%;
-  opacity: .13;
+  background-size: 115% 115%;
+  opacity: .22;
   pointer-events: none;
   z-index: 0;
 }
@@ -515,5 +515,5 @@ body > * { position: relative; z-index: 1; }
 
 @media (max-width: 700px) {
   /* Taller than it is wide on phones — stretch to fill without cropping out */
-  body::before { background-size: 190% 90%; opacity: .1; }
+  body::before { background-size: 190% 90%; opacity: .18; }
 }
