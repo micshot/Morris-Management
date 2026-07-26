@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
+import { withSeparators } from "@/lib/format";
 
 type Ev = { id: string; type: string; detail: string | null; createdAt: string };
 type Bk = { id: string; startsAt: string; durationMinutes: number; status: string };
@@ -164,7 +165,7 @@ export default function LeadsPage() {
                   {p.phone && <div className="lead-fact">☎ {p.phone}</div>}
                   {p.email && <div className="lead-fact">✉ {p.email}</div>}
                   {p.location && <div className="lead-fact">⌖ {p.location}</div>}
-                  {p.budget && <div className="lead-fact">₪ {p.budget}</div>}
+                  {p.budget && <div className="lead-fact">₪ {withSeparators(p.budget)}</div>}
                   {p.timeline && <div className="lead-fact">◷ {p.timeline}</div>}
                   {p.propertyType && <div className="lead-fact">⌂ {p.propertyType}</div>}
                 </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
+import { withSeparators } from "@/lib/format";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
@@ -127,7 +128,7 @@ export default function Dashboard() {
                       </span>
                     </td>
                     <td className="muted">{[p.phone, p.email].filter(Boolean).join(" · ") || "—"}</td>
-                    <td className="muted">{[p.location, p.budget].filter(Boolean).join(" · ") || "—"}</td>
+                    <td className="muted">{[p.location, withSeparators(p.budget)].filter(Boolean).join(" · ") || "—"}</td>
                     <td style={{ width: 22 }}><span className="row-go"><Icon name="arrow" size={13} /></span></td>
                   </tr>
                 ))}
@@ -174,7 +175,7 @@ export default function Dashboard() {
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, padding: "11px 16px", borderBottom: "1px solid var(--line)" }}>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.title}</div>
-                    <div className="muted" style={{ fontSize: 12 }}>{[p.location, p.price].filter(Boolean).join(" · ")}</div>
+                    <div className="muted" style={{ fontSize: 12 }}>{[p.location, withSeparators(p.price)].filter(Boolean).join(" · ")}</div>
                   </div>
                   <span className={pill(p.reviewStatus)}>{p.reviewStatus}</span>
                 </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { withSeparators } from "@/lib/format";
+
 import { useEffect, useState, useRef, useCallback } from "react";
 
 type Img = { id?: string; url: string; label: string | null; kind: string };
@@ -163,7 +165,7 @@ export default function PropertiesPage() {
                     </td>
                     <td style={{ fontWeight: 600, color: "var(--forest)" }}>{p.title}{p.images && p.images.length > 1 && <span className="muted" style={{ fontWeight: 400, fontSize: 12 }}> · {p.images.length} imgs</span>}</td>
                     <td className="muted">{p.location || "—"}</td>
-                    <td className="muted mono">{p.price || "—"}</td>
+                    <td className="muted mono">{withSeparators(p.price) || "—"}</td>
                     <td className="muted mono">{p.rooms || "—"}</td>
                     <td className="muted mono">{p.sizeSqm || "—"}</td>
                     <td><span className={pill(p.reviewStatus)}>{p.reviewStatus}</span></td>
