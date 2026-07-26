@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Icon from "@/components/Icon";
 
 type Booking = {
   id: string; startsAt: string; durationMinutes: number;
@@ -12,6 +13,20 @@ const statusPill = (s: string) => {
   const map: Record<string, string> = { REQUESTED: "pill-warm", CONFIRMED: "pill-live", CANCELLED: "pill-unset" };
   return `pill ${map[s] ?? "pill-unset"}`;
 };
+
+// Status as a single dot: confirmed = solid green, requested = amber ring,
+// cancelled = grey. Same information as the pill in a fraction of the width.
+function StatusDot({ status }: { status: string }) {
+  const map: Record<string, string> = { CONFIRMED: "var(--live)", REQUESTED: "var(--warm)", CANCELLED: "var(--muted)" };
+  const c = map[status] ?? "var(--muted)";
+  return (
+    <span title={status} aria-label={status} style={{
+      width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+      background: status === "REQUESTED" ? "transparent" : c,
+      border: status === "REQUESTED" ? `1.6px solid ${c}` : "none",
+    }} />
+  );
+}
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -39,19 +54,30 @@ export default function BookingsPage() {
         {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : bookings.length === 0 ? (
           <p className="muted" style={{ padding: 16 }}>No calls booked yet.</p>
         ) : (
-          <table className="table stack-table">
-            <thead><tr><th>When</th><th>Lead</th><th>Contact</th><th>Length</th><th>Status</th><th></th></tr></thead>
+          <table className="table">
+            <thead><tr><th>When</th><th>Lead</th><th>Contact</th><th>Length</th><th></th></tr></thead>
             <tbody>
               {bookings.map((b) => (
                 <tr key={b.id} style={{ cursor: "default" }}>
-                  <td data-label="When" className="cell-lead" style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
-                  <td data-label="Lead">{b.person?.name ?? "Unnamed"}</td>
-                  <td data-label="Contact" className="muted">{[b.person?.phone, b.person?.email].filter(Boolean).join(" · ") || "—"}</td>
-                  <td data-label="Length" className="muted mono">{b.durationMinutes} min</td>
-                  <td data-label="Status"><span className={statusPill(b.status)}>{b.status}</span></td>
-                  <td className="cell-actions" style={{ textAlign: "right", whiteSpace: "nowrap" }}>
-                    {b.status !== "CONFIRMED" && <button className="btn btn-ghost btn-sm" onClick={() => setStatus(b.id, "CONFIRMED")}>Confirm</button>}
-                    {b.status !== "CANCELLED" && <button className="btn btn-danger btn-sm" style={{ marginLeft: 6 }} onClick={() => setStatus(b.id, "CANCELLED")}>Cancel</button>}
+                  <td style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
+                  <td>{b.person?.name ?? "Unnamed"}</td>
+                  <td className="muted">{[b.person?.phone, b.person?.email].filter(Boolean).join(" · ") || "—"}</td>
+                  <td className="muted mono">{b.durationMinutes} min</td>
+                  
+                  <td style={{ width: 34 }}>
+                    <span className="act-stack">
+                      <StatusDot status={b.status} />
+                      {b.status !== "CONFIRMED" && (
+                        <button className="act" title="Confirm" aria-label="Confirm" onClick={() => setStatus(b.id, "CONFIRMED")}>
+                          <Icon name="check" size={13} color="var(--live)" />
+                        </button>
+                      )}
+                      {b.status !== "CANCELLED" && (
+                        <button className="act act-x" title="Cancel" aria-label="Cancel" onClick={() => setStatus(b.id, "CANCELLED")}>
+                          <Icon name="x" size={13} color="var(--hot)" />
+                        </button>
+                      )}
+                    </span>
                   </td>
                 </tr>
               ))}
