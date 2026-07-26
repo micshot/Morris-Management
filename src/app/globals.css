@@ -515,5 +515,5 @@ body > * { position: relative; z-index: 1; }
 
 @media (max-width: 700px) {
   /* Taller than it is wide on phones — stretch to fill without cropping out */
-  body::before { background-size: 190% 90%; opacity: .18; }
+  body::before { background-size: 118% auto; opacity: .2; }
 }
