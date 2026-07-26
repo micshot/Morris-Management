@@ -59,8 +59,8 @@ export default function CalendarPage() {
         </div>
       </div>
 
-      <div className="panel" style={{ overflow: "hidden" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)" }}>
+      <div className="panel cal-wrap">
+        <div className="cal-grid">
           {DOW.map((d) => (
             <div key={d} style={{ padding: "10px 12px", fontSize: 11, fontWeight: 700, letterSpacing: ".05em", textTransform: "uppercase", color: "var(--muted)", borderBottom: "1px solid var(--line)", background: "var(--surface-2)", textAlign: "center" }}>{d}</div>
           ))}

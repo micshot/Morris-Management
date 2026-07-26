@@ -35,7 +35,7 @@ export default function BookingsPage() {
         <div><div className="eyebrow">Schedule</div><h1 style={{ fontSize: 30, marginTop: 4 }}>Intro Calls</h1></div>
         <button className="btn btn-ghost" onClick={load}>Refresh</button>
       </div>
-      <div className="panel" style={{ overflow: "hidden" }}>
+      <div className="panel panel-scroll">
         {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : bookings.length === 0 ? (
           <p className="muted" style={{ padding: 16 }}>No calls booked yet.</p>
         ) : (

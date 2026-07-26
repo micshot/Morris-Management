@@ -144,7 +144,7 @@ export default function PropertiesPage() {
         </div>
       )}
 
-      <div className="panel" style={{ overflow: "hidden" }}>
+      <div className="panel panel-scroll">
         {loading ? <p className="muted" style={{ padding: 16 }}>Loading…</p> : items.length === 0 ? (
           <p className="muted" style={{ padding: 16 }}>No listings yet. Upload a sheet or add one manually.</p>
         ) : (

@@ -55,7 +55,7 @@ export default function Dashboard() {
         <button className="btn btn-ghost" onClick={load}>Refresh</button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 28 }}>
+      <div className="stat-grid" style={{ marginBottom: 28 }}>
         {stats.map((s) => (
           <div key={s.label} className="panel" style={{ padding: "18px 20px" }}>
             <div className="mono" style={{ fontSize: 32, fontFamily: 'Fraunces, serif', fontWeight: 600, color: "var(--forest)", lineHeight: 1 }}>{s.value}</div>
@@ -64,8 +64,8 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 24 }}>
-        <section className="panel" style={{ overflow: "hidden" }}>
+      <div className="split-grid">
+        <section className="panel panel-scroll">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 16px", borderBottom: "1px solid var(--line)" }}>
             <h3 style={{ fontSize: 15 }}>Leads · hottest first</h3>
             <Link href="/leads" style={{ fontSize: 12.5, fontWeight: 600 }}>View all →</Link>
