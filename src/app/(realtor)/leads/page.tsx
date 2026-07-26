@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import TempMark from "@/components/TempMark";
 
 type Ev = { id: string; type: string; detail: string | null; createdAt: string };
 type Person = {
@@ -103,7 +104,7 @@ export default function LeadsPage() {
               <div key={p.id} className={`lead-card temp-${p.temperature.toLowerCase()}`} onClick={() => edit(p)}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                   <div>
-                    <div className="lead-name">{p.name ?? "Unnamed lead"}</div>
+                    <div className="lead-name" style={{ display: "flex", alignItems: "center", gap: 7 }}><TempMark temp={p.temperature} size={12} />{p.name ?? "Unnamed lead"}</div>
                     <div className="lead-meta" style={{ marginTop: 2 }}>
                       Added {ago(p.createdAt)} · active {ago(p.updatedAt)}
                     </div>
@@ -144,7 +145,7 @@ export default function LeadsPage() {
           <div onClick={(e) => e.stopPropagation()} style={{ width: 460, maxWidth: "100vw", background: "var(--parchment)", height: "100vh", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,.25)", borderLeft: "1px solid var(--gold)" }}>
             <div style={{ padding: "18px 24px 0", background: "var(--surface)", position: "sticky", top: 0, zIndex: 1, borderBottom: "1px solid var(--line)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h2 style={{ fontSize: 20 }}>{open.name ?? "Unnamed lead"}</h2>
+                <h2 style={{ fontSize: 20, display: "flex", alignItems: "center", gap: 8 }}><TempMark temp={open.temperature} size={13} />{open.name ?? "Unnamed lead"}</h2>
                 <button className="btn btn-ghost btn-sm" onClick={close}>Close</button>
               </div>
               <div className="muted" style={{ fontSize: 12, margin: "4px 0 10px" }}>

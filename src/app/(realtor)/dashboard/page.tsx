@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import TempMark from "@/components/TempMark";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
@@ -78,7 +79,7 @@ export default function Dashboard() {
               <tbody>
                 {leads.slice(0, 8).map((p) => (
                   <tr key={p.id} onClick={() => (window.location.href = "/leads")}>
-                    <td style={{ fontWeight: 600, color: "var(--forest)" }}>{p.name ?? "Unnamed"}</td>
+                    <td style={{ fontWeight: 600, color: "var(--forest)" }}><span style={{ display: "flex", alignItems: "center", gap: 7 }}><TempMark temp={p.temperature} />{p.name ?? "Unnamed"}</span></td>
                     <td className="muted">{[p.phone, p.email].filter(Boolean).join(" · ") || "—"}</td>
                     <td className="muted">{[p.location, p.budget].filter(Boolean).join(" · ") || "—"}</td>
                     <td><span className={pill(p.temperature)}>{p.temperature}</span></td>
