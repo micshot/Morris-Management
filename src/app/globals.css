@@ -331,3 +331,28 @@ input:focus, textarea:focus, select:focus {
   .stat-num { font-size: 25px; }
   .stat { padding: 13px 13px 12px; border-radius: 12px; }
 }
+
+/* Stat cards are links — make that legible */
+a.stat { display: block; text-decoration: none; color: inherit; }
+a.stat:hover { color: inherit; }
+a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px; }
+.stat-go { color: var(--gold-soft); opacity: 0; transition: opacity .14s ease, transform .14s ease; }
+.stat:hover .stat-go { opacity: 1; transform: translateX(2px); }
+/* Touch devices never hover — always show the affordance */
+@media (hover: none) {
+  .stat-go { opacity: .55; }
+  .row-go { opacity: .5; }
+}
+
+/* Filter banner on leads */
+.filter-note {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 999px; margin-bottom: 16px;
+  font-size: 12.5px; font-weight: 600; color: var(--gold-soft);
+  background: rgba(168,133,50,.12); border: 1px solid rgba(168,133,50,.35);
+}
+.filter-note button {
+  background: transparent; border: none; color: var(--muted);
+  cursor: pointer; font-size: 15px; line-height: 1; padding: 0 0 0 2px; font-family: inherit;
+}
+.filter-note button:hover { color: #fff; }

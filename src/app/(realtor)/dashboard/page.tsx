@@ -63,10 +63,10 @@ export default function Dashboard() {
   const g = greeting();
 
   const stats = [
-    { icon: "users", value: people.length, label: "Total leads", spark: newToday > 0 ? `${newToday} new today` : "no new today" },
-    { icon: "flame", value: hot, label: "Hot leads", spark: hot > 0 ? "worth calling now" : "none hot yet" },
-    { icon: "phone", value: upcoming, label: "Upcoming calls", spark: nextCall ? `next in ${ago(nextCall.startsAt).replace("-", "")}` : "nothing booked" },
-    { icon: "home", value: live, label: "Live listings", spark: `${props.length} total` },
+    { icon: "users", value: people.length, label: "Total leads", href: "/leads", spark: newToday > 0 ? `${newToday} new today` : "no new today" },
+    { icon: "flame", value: hot, label: "Hot leads", href: "/leads?temp=HOT", spark: hot > 0 ? "worth calling now" : "none hot yet" },
+    { icon: "phone", value: upcoming, label: "Upcoming calls", href: "/bookings", spark: nextCall ? `next in ${ago(nextCall.startsAt)}` : "nothing booked" },
+    { icon: "home", value: live, label: "Live listings", href: "/properties", spark: `${props.length} total` },
   ];
 
   return (
@@ -92,14 +92,15 @@ export default function Dashboard() {
 
       <div className="stat-grid" style={{ marginBottom: 26 }}>
         {stats.map((s) => (
-          <div key={s.label} className="stat">
+          <Link key={s.label} href={s.href} className="stat" aria-label={`${s.label}: ${s.value}`}>
             <div className="stat-top">
               <span className="stat-badge"><Icon name={s.icon} size={15} /></span>
+              <span className="stat-go"><Icon name="arrow" size={13} /></span>
             </div>
             <div className="stat-num">{loading ? "–" : s.value}</div>
             <div className="stat-label">{s.label}</div>
             <div className="stat-spark"><Icon name="sparkle" size={10} color="var(--gold-soft)" fill="var(--gold-soft)" strokeWidth={0} /> {s.spark}</div>
-          </div>
+          </Link>
         ))}
       </div>
 

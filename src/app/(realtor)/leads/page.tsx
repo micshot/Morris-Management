@@ -50,6 +50,17 @@ export default function LeadsPage() {
   const [tab, setTab] = useState<"details" | "history">("details");
   const [draft, setDraft] = useState<Partial<Person>>({});
   const [saving, setSaving] = useState(false);
+  const [tempFilter, setTempFilter] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("temp");
+    if (t) setTempFilter(t.toUpperCase());
+  }, []);
+
+  function clearFilter() {
+    setTempFilter(null);
+    window.history.replaceState({}, "", "/leads");
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -80,7 +91,9 @@ export default function LeadsPage() {
     if (res.ok) { const d = await res.json(); await load(); if (d.person) edit(d.person); }
   }
 
-  const sorted = [...people].sort((a, b) => order[a.temperature] - order[b.temperature] || +new Date(b.updatedAt) - +new Date(a.updatedAt));
+  const sorted = [...people]
+    .filter((p) => !tempFilter || p.temperature === tempFilter)
+    .sort((a, b) => order[a.temperature] - order[b.temperature] || +new Date(b.updatedAt) - +new Date(a.updatedAt));
 
   return (
     <>
@@ -91,6 +104,13 @@ export default function LeadsPage() {
           <button className="btn btn-gold" onClick={addLead}>+ Add lead</button>
         </div>
       </div>
+
+      {tempFilter && (
+        <div className="filter-note">
+          Showing {tempFilter} leads only
+          <button onClick={clearFilter} aria-label="Clear filter">×</button>
+        </div>
+      )}
 
       {loading ? <p className="muted">Loading…</p> : sorted.length === 0 ? (
         <div className="panel" style={{ padding: 24, textAlign: "center" }}>
