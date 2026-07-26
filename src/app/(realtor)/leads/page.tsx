@@ -13,7 +13,7 @@ type Person = {
   location: string | null; budget: string | null; financingStatus: string | null;
   timeline: string | null; source: string | null; notes: string | null;
   temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string;
-  createdAt: string; updatedAt: string; events?: Ev[]; bookings?: Bk[];
+  createdAt: string; updatedAt: string; lastIp?: string | null; lastSeenAt?: string | null; messageCount?: number; events?: Ev[]; bookings?: Bk[];
 };
 
 const ROLES = ["BUYER", "SELLER", "RENTER", "INVESTOR", "UNKNOWN"];
@@ -153,7 +153,11 @@ export default function LeadsPage() {
                     <div className="lead-name">{p.name ?? "Unnamed lead"}</div>
                     <div className="lead-meta" style={{ marginTop: 2 }}>
                       Added {ago(p.createdAt)} · active {ago(p.updatedAt)}
+                      {typeof p.messageCount === "number" && p.messageCount > 0 && <> · {p.messageCount} msg{p.messageCount > 1 ? "s" : ""}</>}
                     </div>
+                    {p.lastIp && (
+                      <div className="lead-ip mono" title="Origin IP of their last message">{p.lastIp}</div>
+                    )}
                   </div>
                 </div>
 
@@ -203,6 +207,8 @@ export default function LeadsPage() {
               </div>
               <div className="muted" style={{ fontSize: 12, margin: "4px 0 10px" }}>
                 Added {new Date(open.createdAt).toLocaleString()} · source {open.source ?? "unknown"}
+                {open.lastIp && <> · IP <span className="mono">{open.lastIp}</span></>}
+                {typeof open.messageCount === "number" && open.messageCount > 0 && <> · {open.messageCount} messages</>}
               </div>
               <div style={{ display: "flex", gap: 2 }}>
                 {(["details", "history"] as const).map((t) => (

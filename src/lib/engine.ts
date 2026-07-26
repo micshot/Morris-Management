@@ -7,7 +7,8 @@ type Msg = { role: "user" | "assistant"; content: string };
 export async function runConversation(
   messages: Msg[],
   conversationId: string | null,
-  source: string
+  source: string,
+  originIp?: string | null
 ): Promise<{ reply: string } | { error: string; status: number }> {
   const { prisma } = await import("@/lib/db");
   const { getCurrentAgencyId } = await import("@/lib/tenant");
@@ -118,6 +119,9 @@ ${propertyContext}${verificationNote}`;
           timeline: lead.timeline ?? existing?.timeline ?? null,
           source: lead.source ?? existing?.source ?? source,
           temperature: lead.temperature,
+          lastIp: originIp ?? existing?.lastIp ?? null,
+          lastSeenAt: new Date(),
+          messageCount: (existing?.messageCount ?? 0) + 1,
         };
         if (existing) {
           await prisma.person.update({ where: { id: existing.id }, data });

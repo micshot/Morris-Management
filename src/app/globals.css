@@ -471,3 +471,9 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 .timeline-item.tl-discussed .timeline-type { color: var(--cold); }
 .timeline-item.tl-updated .timeline-detail,
 .timeline-item.tl-viewing .timeline-detail { color: var(--muted); }
+
+/* Origin IP on lead cards — small, secondary, never competes with the name */
+.lead-ip {
+  font-size: 10.5px; color: #7c8a80; margin-top: 3px;
+  letter-spacing: .02em;
+}

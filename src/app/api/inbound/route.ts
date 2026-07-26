@@ -32,7 +32,10 @@ export async function POST(req: NextRequest) {
   const history = Array.isArray(body.history) ? body.history : [];
   const messages = [...history, { role: "user" as const, content: text }];
 
-  const result = await runConversation(messages, conversationId, channel);
+  const fwd = req.headers.get("x-forwarded-for");
+  const originIp = fwd ? fwd.split(",")[0].trim() : req.headers.get("x-real-ip");
+
+  const result = await runConversation(messages, conversationId, channel, originIp);
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }

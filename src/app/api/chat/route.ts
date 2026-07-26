@@ -21,7 +21,11 @@ export async function POST(req: NextRequest) {
   const conversationId = typeof body.conversationId === "string" ? body.conversationId : null;
   const source = typeof body.source === "string" ? body.source : "web-chat";
 
-  const result = await runConversation(messages, conversationId, source);
+  // Behind Railway's proxy the real client sits at the head of x-forwarded-for.
+  const fwd = req.headers.get("x-forwarded-for");
+  const originIp = fwd ? fwd.split(",")[0].trim() : req.headers.get("x-real-ip");
+
+  const result = await runConversation(messages, conversationId, source, originIp);
   if ("error" in result) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }

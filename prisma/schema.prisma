@@ -96,6 +96,9 @@ model Person {
   verificationState   VerificationState @default(NONE)
   failedVerifications Int               @default(0)
   notes               String?           // agent's private notes on this lead
+  lastIp              String?           // origin IP of the most recent message
+  lastSeenAt          DateTime?         // last time this person sent a message
+  messageCount        Int               @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
