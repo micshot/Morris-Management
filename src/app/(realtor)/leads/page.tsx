@@ -114,7 +114,11 @@ export default function LeadsPage() {
     if (res.ok) { const d = await res.json(); await load(); if (d.person) edit(d.person); }
   }
 
-  const sorted = [...people]
+  // A record only counts as a lead once it has a name or a phone number.
+  // Everything else lives in Conversations.
+  const identified = people.filter((p) => (p.name && p.name.trim() !== "" && p.name !== "New lead") || (p.phone && p.phone.trim() !== ""));
+
+  const sorted = [...identified]
     .filter((p) => !tempFilter || p.temperature === tempFilter)
     .sort((a, b) => order[a.temperature] - order[b.temperature] || +new Date(b.updatedAt) - +new Date(a.updatedAt));
 

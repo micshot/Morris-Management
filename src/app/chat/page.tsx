@@ -102,10 +102,10 @@ export default function ChatPage() {
         <div ref={endRef} />
       </div>
 
-      {messages.length > 0 && !noticeDismissed && (
+      {!noticeDismissed && (
         <div className="privacy-note">
           <span>
-            By continuing this chat you agree that we may collect and store the details you share —
+            By using this chat you agree that we may collect and store the details you share —
             including your name, phone number, email and what you tell us about your property search —
             along with technical data such as your IP address, so an agent can follow up with you.
           </span>

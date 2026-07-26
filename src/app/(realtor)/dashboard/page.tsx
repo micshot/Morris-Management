@@ -51,23 +51,27 @@ export default function Dashboard() {
   useEffect(() => { load(); }, []);
 
   const order = { HOT: 0, WARM: 1, COLD: 2, UNSET: 3 } as const;
-  const leads = [...people].sort((a, b) => order[a.temperature] - order[b.temperature]);
-  const hot = people.filter((p) => p.temperature === "HOT").length;
+  const isIdentified = (p: Person) => (!!p.name && p.name.trim() !== "" && p.name !== "New lead") || (!!p.phone && p.phone.trim() !== "");
+  const identified = people.filter(isIdentified);
+  const anonymous = people.length - identified.length;
+  const leads = [...identified].sort((a, b) => order[a.temperature] - order[b.temperature]);
+  const hot = identified.filter((p) => p.temperature === "HOT").length;
   const live = props.filter((p) => p.reviewStatus === "LIVE").length;
   const upcoming = bookings.filter((b) => b.status !== "CANCELLED").length;
 
   const dayAgo = Date.now() - 86400000;
-  const newToday = people.filter((p) => +new Date(p.createdAt) > dayAgo).length;
+  const newToday = identified.filter((p) => +new Date(p.createdAt) > dayAgo).length;
   const nextCall = bookings.filter((b) => b.status !== "CANCELLED" && +new Date(b.startsAt) > Date.now())
     .sort((a, b) => +new Date(a.startsAt) - +new Date(b.startsAt))[0];
 
   const g = greeting();
 
   const stats = [
-    { icon: "users", value: people.length, label: "Total leads", href: "/leads", spark: newToday > 0 ? `${newToday} new today` : "no new today" },
+    { icon: "users", value: identified.length, label: "Total leads", href: "/leads", spark: newToday > 0 ? `${newToday} new today` : "no new today" },
     { icon: "flame", value: hot, label: "Hot leads", href: "/leads?temp=HOT", spark: hot > 0 ? "worth calling now" : "none hot yet" },
     { icon: "phone", value: upcoming, label: "Upcoming calls", href: "/bookings", spark: nextCall ? `next in ${ago(nextCall.startsAt)}` : "nothing booked" },
     { icon: "home", value: live, label: "Live listings", href: "/properties", spark: `${props.length} total` },
+    { icon: "chat", value: anonymous, label: "Conversations", href: "/conversations", spark: anonymous > 0 ? "no contact details yet" : "all identified" },
   ];
 
   return (

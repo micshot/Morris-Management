@@ -491,3 +491,6 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
   font-size: 11.5px; font-weight: 600; cursor: pointer; font-family: inherit;
 }
 .privacy-note button:hover { border-color: var(--gold-soft); color: #fff; }
+
+/* Five stats fit better in a wrapping grid than a fixed four-up */
+.stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
