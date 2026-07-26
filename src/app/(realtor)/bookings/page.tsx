@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type Booking = {
   id: string; startsAt: string; durationMinutes: number;
@@ -32,6 +33,7 @@ function StatusDot({ status }: { status: string }) {
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   async function load() {
     setLoading(true);
@@ -59,7 +61,12 @@ export default function BookingsPage() {
             <thead><tr><th>When</th><th>Lead</th><th>Contact</th><th>Length</th><th></th></tr></thead>
             <tbody>
               {bookings.map((b) => (
-                <tr key={b.id} style={{ cursor: "default" }}>
+                <tr
+                  key={b.id}
+                  onClick={() => { if (b.person) router.push(`/leads?id=${b.person.id}`); }}
+                  style={{ cursor: b.person ? "pointer" : "default" }}
+                  title={b.person ? "Open lead record" : undefined}
+                >
                   <td style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
                   <td>
                     {b.person ? (
@@ -81,12 +88,12 @@ export default function BookingsPage() {
                     <span className="act-stack">
                       <StatusDot status={b.status} />
                       {b.status !== "CONFIRMED" && (
-                        <button className="act" title="Confirm" aria-label="Confirm" onClick={() => setStatus(b.id, "CONFIRMED")}>
+                        <button className="act" title="Confirm" aria-label="Confirm" onClick={(e) => { e.stopPropagation(); setStatus(b.id, "CONFIRMED"); }}>
                           <Icon name="check" size={13} color="var(--live)" />
                         </button>
                       )}
                       {b.status !== "CANCELLED" && (
-                        <button className="act act-x" title="Cancel" aria-label="Cancel" onClick={() => setStatus(b.id, "CANCELLED")}>
+                        <button className="act act-x" title="Cancel" aria-label="Cancel" onClick={(e) => { e.stopPropagation(); setStatus(b.id, "CANCELLED"); }}>
                           <Icon name="x" size={13} color="var(--hot)" />
                         </button>
                       )}

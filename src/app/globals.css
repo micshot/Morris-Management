@@ -390,3 +390,7 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
   background: rgba(168,133,50,.12); border: 1px solid rgba(168,133,50,.32);
 }
 .call-chip .muted { font-weight: 500; }
+
+/* Clickable rows: bigger tap target, clear feedback */
+.table tbody tr[title] td { padding-top: 13px; padding-bottom: 13px; }
+.table tbody tr:active { background: rgba(168,133,50,.10); }
