@@ -16,18 +16,22 @@ export type ExtractedLead = {
   timeline: string | null;
   source: string | null;
   temperature: "HOT" | "WARM" | "COLD" | "UNSET";
+  /// One-line note of what the buyer said in their latest message — written to
+  /// the lead's history so the agent can read the conversation without opening it.
+  summary: string | null;
 };
 
 const EXTRACTION_SYSTEM = `You extract structured lead data from a real estate buyer conversation.
 Return ONLY a JSON object, no prose, no markdown fences, with exactly these keys:
-name, phone, email, preferredChannel, role, propertyType, location, budget, financingStatus, timeline, source, temperature
+name, phone, email, preferredChannel, role, propertyType, location, budget, financingStatus, timeline, source, temperature, summary
 
 Rules:
 - Use null for anything not stated or not reasonably inferable. Never invent contact details.
 - role: one of BUYER, SELLER, RENTER, INVESTOR, UNKNOWN.
 - temperature: HOT if they gave contact info or asked to speak to an agent / book a call or showed strong specific intent; WARM if actively engaged with specifics (budget, area, timeline); COLD if vague or just browsing; UNSET if there is nothing to judge.
 - budget/timeline/financingStatus: short free text as stated (e.g. "2.1M NIS", "within 3 months", "pre-approved").
-- source: how they arrived if stated, else null.`;
+- source: how they arrived if stated, else null.
+- summary: one concise sentence (max 20 words) describing what the BUYER said or asked in their most recent message, written for an agent skimming a history log. Past tense, no fluff. Examples: "Asked about 3-room options in Modiin under 2.2M." / "Gave phone number and asked to speak with an agent." / "Said they are pre-approved and want to move within 3 months." Use null only if the message carried no meaningful content.`;
 
 export async function extractLead(
   anthropic: Anthropic,

@@ -77,7 +77,9 @@ Your job:
 - Answer questions about available properties using ONLY the property list below. Never invent properties, prices, or details that are not listed.
 - If asked about something not in the list, say you don't have that available and offer to connect them with an agent.
 - You do NOT negotiate, quote deal terms, discuss financing specifics, or make commitments. For anything about price negotiation, mortgages, financing, or closing terms, say that is best discussed directly with the agent and offer to set up a short intro call.
-- Naturally learn who you're speaking with: what they want, their area, budget, timeline, and how to reach them - but do not interrogate.
+- Learn what they want: area, budget, timeline, property type.
+- Getting their NAME and PHONE NUMBER is your priority once they show real interest. Ask for them directly but warmly, and explain why: so an agent can follow up properly. Email is optional - only ask if they say they prefer email or decline to give a phone number.
+- If they deflect on contact details, keep helping and ask again naturally a little later. Do not badger them on consecutive messages, and never refuse to help someone who won't share details.
 - Be warm, concise, and helpful. Move a genuinely interested buyer toward booking a short intro call with the agent.
 
 Available properties (these are the only ones you may discuss):
@@ -131,11 +133,21 @@ ${propertyContext}${verificationNote}`;
               data: { agencyId, personId: existing.id, type: "updated", detail: `AI learned - ${changes.join(", ")}` },
             });
           }
+          if (lead.summary) {
+            await prisma.leadEvent.create({
+              data: { agencyId, personId: existing.id, type: "discussed", detail: lead.summary },
+            });
+          }
         } else {
           const created = await prisma.person.create({ data: { agencyId, conversationId, ...data } });
           await prisma.leadEvent.create({
             data: { agencyId, personId: created.id, type: "captured", detail: `Captured from ${source}${data.name ? ` as ${data.name}` : ""}` },
           });
+          if (lead.summary) {
+            await prisma.leadEvent.create({
+              data: { agencyId, personId: created.id, type: "discussed", detail: lead.summary },
+            });
+          }
         }
       }
     } catch {

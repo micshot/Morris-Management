@@ -464,3 +464,10 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 460px) { .form-grid { grid-template-columns: 1fr; } }
+
+/* Conversation entries read differently from system events */
+.timeline-item.tl-discussed .timeline-detail { color: var(--text); }
+.timeline-item.tl-discussed::before { background: var(--cold); box-shadow: 0 0 0 3px rgba(42,111,142,.2); }
+.timeline-item.tl-discussed .timeline-type { color: var(--cold); }
+.timeline-item.tl-updated .timeline-detail,
+.timeline-item.tl-viewing .timeline-detail { color: var(--muted); }

@@ -263,8 +263,8 @@ export default function LeadsPage() {
                 ) : (
                   <div className="timeline">
                     {open.events.map((e) => (
-                      <div key={e.id} className="timeline-item">
-                        <div className="timeline-type">{e.type}</div>
+                      <div key={e.id} className={`timeline-item tl-${e.type}`}>
+                        <div className="timeline-type">{e.type === "discussed" ? "conversation" : e.type}</div>
                         <div className="timeline-detail">{e.detail ?? "—"}</div>
                         <div className="timeline-when">{new Date(e.createdAt).toLocaleString()}</div>
                       </div>
