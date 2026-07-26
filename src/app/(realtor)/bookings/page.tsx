@@ -65,21 +65,21 @@ export default function BookingsPage() {
               {bookings.map((b) => (
                 <tr
                   key={b.id}
-                  onClick={() => { if (b.person) router.push(`/leads?id=${b.person.id}`); }}
+                  onClick={() => { if (b.person) router.push(`/leads?id=${b.person.id}&tab=history`); }}
                   style={{ cursor: b.person ? "pointer" : "default" }}
                   title={b.person ? "Open lead record" : undefined}
                 >
                   <td style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
                   <td>
                     {b.person ? (
-                      <Link href={`/leads?id=${b.person.id}`} className="lead-link" title="Open lead record">
+                      <Link href={`/leads?id=${b.person.id}&tab=history`} className="lead-link" title="Open lead record">
                         {b.person.name ?? "Unnamed"} <Icon name="arrow" size={11} />
                       </Link>
                     ) : "Unnamed"}
                   </td>
                   <td className="muted">
                     {b.person ? (
-                      <Link href={`/leads?id=${b.person.id}`} className="lead-link muted" title="Open lead record">
+                      <Link href={`/leads?id=${b.person.id}&tab=history`} className="lead-link muted" title="Open lead record">
                         {[formatPhone(b.person.phone), b.person.email].filter(Boolean).join(" · ") || "—"}
                       </Link>
                     ) : "—"}

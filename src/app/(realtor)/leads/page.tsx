@@ -68,6 +68,9 @@ export default function LeadsPage() {
     const target = people.find((p) => p.id === id);
     if (target) {
       edit(target);
+      // Arriving from a booking? The realtor wants context, not the edit form.
+      const wanted = new URLSearchParams(window.location.search).get("tab");
+      if (wanted === "history") setTab("history");
       window.history.replaceState({}, "", "/leads");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
