@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
-import { withSeparators } from "@/lib/format";
+import { withSeparators, formatPhone } from "@/lib/format";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
@@ -127,7 +127,7 @@ export default function Dashboard() {
                         <TempMark temp={p.temperature} size={12} withThermo />{p.name ?? "Unnamed"}
                       </span>
                     </td>
-                    <td className="muted">{[p.phone, p.email].filter(Boolean).join(" · ") || "—"}</td>
+                    <td className="muted">{[formatPhone(p.phone), p.email].filter(Boolean).join(" · ") || "—"}</td>
                     <td className="muted">{[p.location, withSeparators(p.budget)].filter(Boolean).join(" · ") || "—"}</td>
                     <td style={{ width: 22 }}><span className="row-go"><Icon name="arrow" size={13} /></span></td>
                   </tr>
@@ -153,7 +153,7 @@ export default function Dashboard() {
                   <span className="stat-badge" style={{ width: 26, height: 26, borderRadius: 8 }}><Icon name="clock" size={13} /></span>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 600, fontSize: 13 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</div>
-                    <div className="muted" style={{ fontSize: 12, marginTop: 1 }}>{b.person?.name ?? b.person?.phone ?? "Unnamed"} · {b.status}</div>
+                    <div className="muted" style={{ fontSize: 12, marginTop: 1 }}>{b.person?.name ?? formatPhone(b.person?.phone) ?? "Unnamed"} · {b.status}</div>
                   </div>
                 </div>
               ))}</div>

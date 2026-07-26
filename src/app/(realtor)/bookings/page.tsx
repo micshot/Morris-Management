@@ -1,5 +1,7 @@
 "use client";
 
+import { formatPhone } from "@/lib/format";
+
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
 import Link from "next/link";
@@ -78,7 +80,7 @@ export default function BookingsPage() {
                   <td className="muted">
                     {b.person ? (
                       <Link href={`/leads?id=${b.person.id}`} className="lead-link muted" title="Open lead record">
-                        {[b.person.phone, b.person.email].filter(Boolean).join(" · ") || "—"}
+                        {[formatPhone(b.person.phone), b.person.email].filter(Boolean).join(" · ") || "—"}
                       </Link>
                     ) : "—"}
                   </td>

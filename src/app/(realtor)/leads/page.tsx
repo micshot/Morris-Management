@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
-import { withSeparators } from "@/lib/format";
+import { withSeparators, formatPhone } from "@/lib/format";
 
 type Ev = { id: string; type: string; detail: string | null; createdAt: string };
 type Bk = { id: string; startsAt: string; durationMinutes: number; status: string };
@@ -162,7 +162,7 @@ export default function LeadsPage() {
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4px 12px" }}>
-                  {p.phone && <div className="lead-fact">☎ {p.phone}</div>}
+                  {p.phone && <div className="lead-fact">☎ {formatPhone(p.phone)}</div>}
                   {p.email && <div className="lead-fact">✉ {p.email}</div>}
                   {p.location && <div className="lead-fact">⌖ {p.location}</div>}
                   {p.budget && <div className="lead-fact">₪ {withSeparators(p.budget)}</div>}
