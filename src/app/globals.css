@@ -381,3 +381,12 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 .lead-link:hover { color: var(--gold-soft); border-bottom-color: rgba(201,168,78,.5); }
 .lead-link svg { opacity: .55; }
 .lead-link:hover svg { opacity: 1; }
+
+/* Upcoming call chip on lead cards / drawer */
+.call-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 10px; padding: 5px 10px; border-radius: 7px;
+  font-size: 11.5px; font-weight: 600; color: var(--gold-soft);
+  background: rgba(168,133,50,.12); border: 1px solid rgba(168,133,50,.32);
+}
+.call-chip .muted { font-weight: 500; }

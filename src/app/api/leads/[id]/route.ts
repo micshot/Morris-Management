@@ -64,6 +64,28 @@ export async function DELETE(
   const existing = await prisma.person.findFirst({ where: { id, agencyId } });
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  // Refuse while the lead still has a scheduled call. Cascading the delete would
+  // silently remove a commitment the agent has in their calendar; make them
+  // cancel it explicitly first.
+  const upcoming = await prisma.booking.findMany({
+    where: { personId: existing.id, status: { not: "CANCELLED" }, startsAt: { gte: new Date() } },
+    orderBy: { startsAt: "asc" },
+  });
+  if (upcoming.length > 0) {
+    const when = new Date(upcoming[0].startsAt).toLocaleString();
+    return NextResponse.json(
+      {
+        error:
+          upcoming.length === 1
+            ? `This lead has an intro call booked for ${when}. Cancel it on the Intro Calls page before deleting.`
+            : `This lead has ${upcoming.length} upcoming intro calls (next: ${when}). Cancel them on the Intro Calls page before deleting.`,
+        blockedBy: "bookings",
+        count: upcoming.length,
+      },
+      { status: 409 }
+    );
+  }
+
   await prisma.person.delete({ where: { id: existing.id } });
   return NextResponse.json({ ok: true });
 }

@@ -16,7 +16,13 @@ export async function GET() {
     where: { agencyId },
     orderBy: { updatedAt: "desc" },
     take: 500,
-    include: { events: { orderBy: { createdAt: "desc" }, take: 20 } },
+    include: {
+      events: { orderBy: { createdAt: "desc" }, take: 20 },
+      bookings: {
+        where: { status: { not: "CANCELLED" }, startsAt: { gte: new Date() } },
+        orderBy: { startsAt: "asc" },
+      },
+    },
   });
   return NextResponse.json({ people });
 }

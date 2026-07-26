@@ -2,15 +2,17 @@
 
 import { useEffect, useState, useCallback } from "react";
 import TempMark from "@/components/TempMark";
+import Icon from "@/components/Icon";
 
 type Ev = { id: string; type: string; detail: string | null; createdAt: string };
+type Bk = { id: string; startsAt: string; durationMinutes: number; status: string };
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
   preferredChannel: string | null; role: string; propertyType: string | null;
   location: string | null; budget: string | null; financingStatus: string | null;
   timeline: string | null; source: string | null; notes: string | null;
   temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string;
-  createdAt: string; updatedAt: string; events?: Ev[];
+  createdAt: string; updatedAt: string; events?: Ev[]; bookings?: Bk[];
 };
 
 const ROLES = ["BUYER", "SELLER", "RENTER", "INVESTOR", "UNKNOWN"];
@@ -96,8 +98,12 @@ export default function LeadsPage() {
   async function remove() {
     if (!open || !confirm("Delete this lead? This can't be undone.")) return;
     setSaving(true);
-    try { const res = await fetch(`/api/leads/${open.id}`, { method: "DELETE" }); if (res.ok) { await load(); close(); } }
-    finally { setSaving(false); }
+    try {
+      const res = await fetch(`/api/leads/${open.id}`, { method: "DELETE" });
+      if (res.ok) { await load(); close(); return; }
+      const d = await res.json().catch(() => ({}));
+      alert(d.error ?? "Could not delete this lead.");
+    } finally { setSaving(false); }
   }
   async function addLead() {
     const res = await fetch("/api/leads", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
@@ -163,6 +169,14 @@ export default function LeadsPage() {
                   {p.propertyType && <div className="lead-fact">⌂ {p.propertyType}</div>}
                 </div>
 
+                {p.bookings && p.bookings.length > 0 && (
+                  <div className="call-chip">
+                    <Icon name="calendar" size={12} color="var(--gold-soft)" />
+                    Call {new Date(p.bookings[0].startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                    {p.bookings.length > 1 && <span className="muted"> +{p.bookings.length - 1}</span>}
+                  </div>
+                )}
+
                 {lastEvent && (
                   <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,.08)", fontSize: 11.5, color: "#8f9c91" }}>
                     <span style={{ color: "var(--gold-soft)", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", fontSize: 10 }}>{lastEvent.type}</span>
@@ -197,6 +211,18 @@ export default function LeadsPage() {
                 ))}
               </div>
             </div>
+
+            {open.bookings && open.bookings.length > 0 && (
+              <div style={{ padding: "12px 24px 0" }}>
+                {open.bookings.map((b) => (
+                  <div key={b.id} className="call-chip" style={{ marginBottom: 6 }}>
+                    <Icon name="calendar" size={12} color="var(--gold-soft)" />
+                    {new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                    <span className="muted"> · {b.durationMinutes} min · {b.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {tab === "details" ? (
               <>
