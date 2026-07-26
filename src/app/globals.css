@@ -247,8 +247,9 @@ input:focus, textarea:focus, select:focus {
 /* ---- Tablet / mobile: collapse rail to icons ---- */
 @media (max-width: 900px) {
   .rail { width: 58px; }
-  .rail-wordmark, .rail-label, .rail-logo { display: none; }
-  .rail-mark { display: inline-flex; }
+  .rail-wordmark, .rail-label { display: none; }
+  .rail-logo { display: inline-flex; }
+  .rail-mark { display: none; }
   .rail-brand { justify-content: center; padding: 20px 0 16px; }
   .rail-nav, .rail-foot { padding: 12px 8px; }
   .rail-link, .rail-out { justify-content: center; gap: 0; padding: 11px 0; border-left: none; }
