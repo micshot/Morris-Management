@@ -371,3 +371,13 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 }
 .act:hover { border-color: var(--live); background: rgba(31,122,68,.12); }
 .act-x:hover { border-color: var(--hot); background: rgba(179,38,30,.12); }
+
+/* Lead links inside other tables */
+.lead-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  color: inherit; font-weight: inherit;
+  border-bottom: 1px dashed transparent;
+}
+.lead-link:hover { color: var(--gold-soft); border-bottom-color: rgba(201,168,78,.5); }
+.lead-link svg { opacity: .55; }
+.lead-link:hover svg { opacity: 1; }

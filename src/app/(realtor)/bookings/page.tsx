@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Icon from "@/components/Icon";
+import Link from "next/link";
 
 type Booking = {
   id: string; startsAt: string; durationMinutes: number;
   status: "REQUESTED" | "CONFIRMED" | "CANCELLED";
-  person: { name: string | null; phone: string | null; email: string | null } | null;
+  person: { id: string; name: string | null; phone: string | null; email: string | null } | null;
 };
 
 const statusPill = (s: string) => {
@@ -60,8 +61,20 @@ export default function BookingsPage() {
               {bookings.map((b) => (
                 <tr key={b.id} style={{ cursor: "default" }}>
                   <td style={{ fontWeight: 600 }}>{new Date(b.startsAt).toLocaleString([], { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}</td>
-                  <td>{b.person?.name ?? "Unnamed"}</td>
-                  <td className="muted">{[b.person?.phone, b.person?.email].filter(Boolean).join(" · ") || "—"}</td>
+                  <td>
+                    {b.person ? (
+                      <Link href={`/leads?id=${b.person.id}`} className="lead-link" title="Open lead record">
+                        {b.person.name ?? "Unnamed"} <Icon name="arrow" size={11} />
+                      </Link>
+                    ) : "Unnamed"}
+                  </td>
+                  <td className="muted">
+                    {b.person ? (
+                      <Link href={`/leads?id=${b.person.id}`} className="lead-link muted" title="Open lead record">
+                        {[b.person.phone, b.person.email].filter(Boolean).join(" · ") || "—"}
+                      </Link>
+                    ) : "—"}
+                  </td>
                   <td className="muted mono">{b.durationMinutes} min</td>
                   
                   <td style={{ width: 34 }}>

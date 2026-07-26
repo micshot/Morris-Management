@@ -57,6 +57,19 @@ export default function LeadsPage() {
     if (t) setTempFilter(t.toUpperCase());
   }, []);
 
+  // Arriving from elsewhere (e.g. an intro call) with ?id= opens that lead directly.
+  useEffect(() => {
+    if (loading || people.length === 0) return;
+    const id = new URLSearchParams(window.location.search).get("id");
+    if (!id) return;
+    const target = people.find((p) => p.id === id);
+    if (target) {
+      edit(target);
+      window.history.replaceState({}, "", "/leads");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, people]);
+
   function clearFilter() {
     setTempFilter(null);
     window.history.replaceState({}, "", "/leads");
