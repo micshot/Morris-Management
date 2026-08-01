@@ -648,3 +648,24 @@ body > * { position: relative; z-index: 1; }
   font-size: 12px; opacity: .62;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+
+/* Today strip: calls and viewings due today, sitting above the ranked list. */
+.brief-today { border-bottom: 1px solid var(--line-strong); }
+.brief-today-head {
+  padding: 9px 16px 3px;
+  font-size: 11px; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--gold-soft); opacity: .8;
+}
+.brief-today-rows { display: flex; flex-direction: column; }
+.brief-today-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 16px; text-decoration: none; color: inherit;
+  transition: background .13s ease;
+}
+.brief-today-row:hover { background: rgba(168,133,50,.07); }
+.brief-time {
+  flex: none; width: 58px;
+  font-size: 12px; font-weight: 600; color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 560px) { .brief-time { width: 48px; font-size: 11px; } }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
 import { withSeparators, formatPhone } from "@/lib/format";
-import DailyBrief, { type BriefPerson } from "@/components/DailyBrief";
+import DailyBrief, { type BriefPerson, type BriefViewing } from "@/components/DailyBrief";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
@@ -16,6 +16,7 @@ type Person = {
   events?: { id: string; type: string; detail: string | null; createdAt: string }[];
 };
 type Booking = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null };
+type Viewing = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null; property: { title: string | null } | null };
 type Property = { id: string; title: string | null; location: string | null; price: string | null; reviewStatus: "DRAFT" | "LIVE" };
 
 const pill = (t: string) => `pill pill-${(t || "unset").toLowerCase()}`;
@@ -39,17 +40,20 @@ export default function Dashboard() {
   const [people, setPeople] = useState<Person[]>([]);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [props, setProps] = useState<Property[]>([]);
+  const [viewings, setViewings] = useState<Viewing[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function load() {
     setLoading(true);
     try {
-      const [l, b, p] = await Promise.all([
+      const [l, b, p, v] = await Promise.all([
         fetch("/api/leads").then((r) => r.json()),
         fetch("/api/bookings").then((r) => r.json()),
         fetch("/api/properties").then((r) => r.json()),
+        fetch("/api/viewings").then((r) => r.json()),
       ]);
-      setPeople(l.people ?? []); setBookings(b.bookings ?? []); setProps(p.properties ?? []);
+      setPeople(l.people ?? []); setBookings(b.bookings ?? []);
+      setProps(p.properties ?? []); setViewings(v.viewings ?? []);
     } finally { setLoading(false); }
   }
   useEffect(() => { load(); }, []);
@@ -99,7 +103,12 @@ export default function Dashboard() {
         <a href="/chat" target="_blank" rel="noreferrer" className="chip"><Icon name="chat" size={14} color="var(--gold-soft)" /> Preview chat</a>
       </div>
 
-      <DailyBrief people={people as BriefPerson[]} loading={loading} />
+      <DailyBrief
+        people={people as BriefPerson[]}
+        bookings={bookings}
+        viewings={viewings as BriefViewing[]}
+        loading={loading}
+      />
 
       <div className="stat-grid" style={{ marginBottom: 26 }}>
         {stats.map((s) => (
