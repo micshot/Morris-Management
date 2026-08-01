@@ -112,7 +112,9 @@ input:focus, textarea:focus, select:focus {
 
 /* Card / panel */
 .panel {
-  background: linear-gradient(165deg, var(--surface) 0%, var(--ink-2) 100%);
+  background: rgba(22, 36, 31, .20);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -124,11 +126,11 @@ input:focus, textarea:focus, select:focus {
   text-align: left; font-size: 11px; font-weight: 700; letter-spacing: .05em;
   text-transform: uppercase; color: var(--muted);
   padding: 10px 14px; border-bottom: 1px solid var(--line);
-  background: rgba(0,0,0,.25);
+  background: rgba(0,0,0,.18);
 }
 .table td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
 .table tbody tr { cursor: pointer; transition: background .1s ease; }
-.table tbody tr:hover { background: var(--surface-2); }
+.table tbody tr:hover { background: rgba(255,255,255,.04); }
 .table tbody tr:last-child td { border-bottom: none; }
 
 /* Eyebrow label */
@@ -148,7 +150,9 @@ input:focus, textarea:focus, select:focus {
 /* ===== Edge: gold-keyline lead cards ===== */
 .lead-card {
   position: relative;
-  background: linear-gradient(160deg, var(--ink) 0%, var(--ink-2) 100%);
+  background: rgba(13, 21, 18, .20);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border: 1px solid rgba(168,133,50,.55);
   border-radius: var(--radius);
   padding: 16px 18px 14px;
@@ -206,7 +210,7 @@ input:focus, textarea:focus, select:focus {
 .rail {
   width: var(--sidebar-w); flex-shrink: 0;
   position: sticky; top: 0; height: 100vh;
-  background: rgba(13,21,18,.88); color: #cdd6cf;
+  background: rgba(13,21,18,.82); backdrop-filter: blur(18px); color: #cdd6cf;
   border-right: 1px solid var(--line-strong);
   display: flex; flex-direction: column;
   transition: width .15s ease;
@@ -274,7 +278,9 @@ input:focus, textarea:focus, select:focus {
 /* ===== Modern dashboard surfaces ===== */
 .stat {
   position: relative; overflow: hidden;
-  background: linear-gradient(158deg, var(--surface) 0%, var(--ink-2) 100%);
+  background: rgba(22, 36, 31, .20);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--line-strong); border-radius: 14px;
   padding: 15px 16px 14px;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
@@ -307,7 +313,7 @@ input:focus, textarea:focus, select:focus {
 .chip {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-  color: var(--text); background: var(--surface); border: 1px solid var(--line-strong);
+  color: var(--text); background: rgba(22,36,31,.35); backdrop-filter: blur(10px); border: 1px solid var(--line-strong);
   cursor: pointer; transition: border-color .12s ease, color .12s ease, transform .12s ease;
 }
 .chip:hover { border-color: var(--gold-soft); color: #fff; transform: translateY(-1px); }
@@ -440,7 +446,9 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 .prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 16px; }
 .prop-card {
   display: flex; flex-direction: column; overflow: hidden;
-  background: linear-gradient(165deg, var(--surface) 0%, var(--ink-2) 100%);
+  background: rgba(22, 36, 31, .20);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
   border: 1px solid var(--line-strong); border-radius: 14px;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
 }
@@ -494,26 +502,34 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 /* Five stats fit better in a wrapping grid than a fixed four-up */
 .stat-grid { grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr)); }
 
-/* ===== Brand watermark =====
-   The mark, blurred and stretched behind everything. Fixed so it stays put
-   while content scrolls; pointer-events off so it never intercepts taps.
-   Pre-blurred as an asset — a CSS blur this large repaints on every scroll. */
+/* ===== Hero background =====
+   The mansion/monogram artwork sits behind the whole app at 50% strength,
+   with a dark scrim so foreground text keeps its contrast. Fixed and
+   pointer-events-off so it never moves or intercepts taps. */
 body::before {
   content: "";
   position: fixed;
-  inset: -10%;
-  background-image: url("/logo-bg.png");
+  inset: 0;
+  background-image: url("/bg-hero.jpg");
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: 115% 115%;
-  opacity: .22;
+  background-position: center center;
+  background-size: cover;
+  opacity: .5;
   pointer-events: none;
   z-index: 0;
 }
-/* Everything real sits above the watermark */
+/* Scrim: without this the photo's bright sky washes out body copy. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13,21,18,.62) 0%, rgba(13,21,18,.78) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
 body > * { position: relative; z-index: 1; }
 
-@media (max-width: 700px) {
-  /* Taller than it is wide on phones — stretch to fill without cropping out */
-  body::before { background-size: 118% auto; opacity: .2; }
+@media (max-width: 760px) {
+  body::before { background-image: url("/bg-hero-mobile.jpg"); }
+}
 }
