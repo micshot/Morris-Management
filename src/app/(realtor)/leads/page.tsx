@@ -203,8 +203,8 @@ export default function LeadsPage() {
 
       {open && (
         <div onClick={close} style={{ position: "fixed", inset: 0, background: "rgba(20,35,29,.5)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: 460, maxWidth: "100vw", background: "var(--parchment)", height: "100vh", overflowY: "auto", boxShadow: "-8px 0 30px rgba(0,0,0,.25)", borderLeft: "1px solid var(--gold)" }}>
-            <div style={{ padding: "18px 24px 0", background: "var(--surface)", position: "sticky", top: 0, zIndex: 1, borderBottom: "1px solid var(--line)" }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass-panel" style={{ width: 460, maxWidth: "100vw", height: "100vh", overflowY: "auto", borderLeft: "1px solid var(--gold)" }}>
+            <div style={{ padding: "18px 24px 0", background: "rgba(11,18,15,.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", position: "sticky", top: 0, zIndex: 1, borderBottom: "1px solid var(--line)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ fontSize: 20, display: "flex", alignItems: "center", gap: 8 }}><TempMark temp={open.temperature} size={13} />{open.name ?? "Unnamed lead"}</h2>
                 <button className="btn btn-ghost btn-sm" onClick={close}>Close</button>
@@ -258,7 +258,7 @@ export default function LeadsPage() {
                     <textarea rows={4} value={(draft.notes as string) ?? ""} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} style={{ resize: "vertical" }} />
                   </label>
                 </div>
-                <div style={{ padding: "16px 24px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", background: "var(--surface)", position: "sticky", bottom: 0 }}>
+                <div style={{ padding: "16px 24px", borderTop: "1px solid var(--line)", display: "flex", justifyContent: "space-between", background: "rgba(11,18,15,.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", position: "sticky", bottom: 0 }}>
                   <button className="btn btn-danger" onClick={remove} disabled={saving}>Delete</button>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button className="btn btn-ghost" onClick={close} disabled={saving}>Cancel</button>

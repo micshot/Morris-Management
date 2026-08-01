@@ -26,6 +26,19 @@
   --draft: #8a7320;
   --draft-bg: #f7efd6;
 
+  /* Glass materials — saturation is what stops the blur going muddy grey.
+     Three thicknesses so elevation reads: chrome > panel > chip. */
+  --glass-thin:    blur(10px) saturate(150%);
+  --glass-regular: blur(18px) saturate(180%);
+  --glass-thick:   blur(30px) saturate(190%);
+  --glass-bg:       rgba(26, 42, 35, .22);
+  --glass-bg-deep:  rgba(13, 21, 18, .26);
+  --glass-bg-chrome: rgba(11, 18, 15, .62);
+  /* Light catches the top edge of a real pane */
+  --glass-edge: rgba(255, 255, 255, .16);
+  --glass-inner: inset 0 1px 0 rgba(255, 255, 255, .10);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, .38);
+
   --radius: 10px;
   --radius-sm: 7px;
   --shadow: 0 1px 2px rgba(0,0,0,.35), 0 6px 22px rgba(0,0,0,.3);
@@ -112,12 +125,13 @@ input:focus, textarea:focus, select:focus {
 
 /* Card / panel */
 .panel {
-  background: rgba(22, 36, 31, .20);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-regular);
+  backdrop-filter: var(--glass-regular);
   border: 1px solid var(--line-strong);
+  border-top-color: var(--glass-edge);
   border-radius: var(--radius);
-  box-shadow: var(--shadow);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
 }
 
 /* Data table */
@@ -150,9 +164,10 @@ input:focus, textarea:focus, select:focus {
 /* ===== Edge: gold-keyline lead cards ===== */
 .lead-card {
   position: relative;
-  background: rgba(13, 21, 18, .20);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: var(--glass-bg-deep);
+  -webkit-backdrop-filter: var(--glass-regular);
+  backdrop-filter: var(--glass-regular);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
   border: 1px solid rgba(168,133,50,.55);
   border-radius: var(--radius);
   padding: 16px 18px 14px;
@@ -210,7 +225,10 @@ input:focus, textarea:focus, select:focus {
 .rail {
   width: var(--sidebar-w); flex-shrink: 0;
   position: sticky; top: 0; height: 100vh;
-  background: rgba(13,21,18,.82); backdrop-filter: blur(18px); color: #cdd6cf;
+  background: var(--glass-bg-chrome);
+  -webkit-backdrop-filter: var(--glass-thick);
+  backdrop-filter: var(--glass-thick);
+  color: #cdd6cf;
   border-right: 1px solid var(--line-strong);
   display: flex; flex-direction: column;
   transition: width .15s ease;
@@ -278,9 +296,10 @@ input:focus, textarea:focus, select:focus {
 /* ===== Modern dashboard surfaces ===== */
 .stat {
   position: relative; overflow: hidden;
-  background: rgba(22, 36, 31, .20);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-regular);
+  backdrop-filter: var(--glass-regular);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
   border: 1px solid var(--line-strong); border-radius: 14px;
   padding: 15px 16px 14px;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
@@ -313,7 +332,8 @@ input:focus, textarea:focus, select:focus {
 .chip {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 8px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-  color: var(--text); background: rgba(22,36,31,.35); backdrop-filter: blur(10px); border: 1px solid var(--line-strong);
+  color: var(--text); background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-thin); backdrop-filter: var(--glass-thin); border: 1px solid var(--line-strong);
   cursor: pointer; transition: border-color .12s ease, color .12s ease, transform .12s ease;
 }
 .chip:hover { border-color: var(--gold-soft); color: #fff; transform: translateY(-1px); }
@@ -446,9 +466,10 @@ a.stat:focus-visible { outline: 2px solid var(--gold-soft); outline-offset: 2px;
 .prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 16px; }
 .prop-card {
   display: flex; flex-direction: column; overflow: hidden;
-  background: rgba(22, 36, 31, .20);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-regular);
+  backdrop-filter: var(--glass-regular);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
   border: 1px solid var(--line-strong); border-radius: 14px;
   transition: transform .14s ease, border-color .14s ease, box-shadow .14s ease;
 }
@@ -531,4 +552,63 @@ body > * { position: relative; z-index: 1; }
 
 @media (max-width: 760px) {
   body::before { background-image: url("/bg-hero-mobile.jpg"); }
+}
+
+/* ===== Glass: specular edge + performance guards ===== */
+
+/* A thin bright line along the top edge sells the "pane of glass" read.
+   Pseudo-element rather than a border so it can fade out at the corners. */
+.panel, .stat, .lead-card, .prop-card { position: relative; }
+.panel::after, .stat::after, .lead-card::after, .prop-card::after {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    160deg,
+    rgba(255,255,255,.09) 0%,
+    rgba(255,255,255,.02) 26%,
+    transparent 55%
+  );
+}
+/* Cards already using ::after for their own art keep it */
+.lead-card::after { background: linear-gradient(160deg, rgba(255,255,255,.07) 0%, transparent 50%); }
+
+/* Drawers and modals are the thickest glass in the app */
+.glass-panel {
+  background: var(--glass-bg-chrome);
+  -webkit-backdrop-filter: var(--glass-thick);
+  backdrop-filter: var(--glass-thick);
+  box-shadow: var(--glass-shadow), var(--glass-inner);
+}
+
+/* PERFORMANCE: backdrop-filter is GPU-expensive and compounds per element.
+   Phones scrolling a long list of blurring cards will drop frames, so step
+   the radius down and drop blur from list items entirely on small screens. */
+@media (max-width: 760px) {
+  :root {
+    --glass-thin:    blur(7px) saturate(150%);
+    --glass-regular: blur(12px) saturate(170%);
+    --glass-thick:   blur(20px) saturate(180%);
+  }
+  .lead-card, .prop-card {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: rgba(16, 26, 22, .74);
+  }
+}
+
+/* No backdrop-filter support (older Firefox, some Android webviews):
+   fall back to solid surfaces so nothing turns into unreadable mush. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .panel, .stat, .prop-card { background: rgba(22, 36, 31, .93); }
+  .lead-card { background: rgba(13, 21, 18, .93); }
+  .chip { background: rgba(22, 36, 31, .93); }
+}
+
+/* Respect reduced transparency the way iOS does */
+@media (prefers-reduced-transparency: reduce) {
+  .panel, .stat, .prop-card { background: rgba(22, 36, 31, .96); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .lead-card { background: rgba(13, 21, 18, .96); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  body::before { opacity: .18; }
 }

@@ -116,8 +116,8 @@ export default function ConversationsPage() {
 
       {open && (
         <div onClick={() => setOpen(null)} style={{ position: "fixed", inset: 0, background: "rgba(13,21,18,.55)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}>
-          <div onClick={(e) => e.stopPropagation()} style={{ width: 440, maxWidth: "100vw", background: "var(--parchment)", height: "100vh", overflowY: "auto", borderLeft: "1px solid var(--gold)" }}>
-            <div style={{ padding: "18px 24px", background: "var(--surface)", borderBottom: "1px solid var(--line)", position: "sticky", top: 0, zIndex: 1 }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass-panel" style={{ width: 440, maxWidth: "100vw", height: "100vh", overflowY: "auto", borderLeft: "1px solid var(--gold)" }}>
+            <div style={{ padding: "18px 24px", background: "rgba(11,18,15,.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", borderBottom: "1px solid var(--line)", position: "sticky", top: 0, zIndex: 1 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ fontSize: 19 }}>Anonymous session</h2>
                 <button className="btn btn-ghost btn-sm" onClick={() => setOpen(null)}>Close</button>

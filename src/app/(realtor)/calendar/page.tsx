@@ -190,7 +190,7 @@ export default function CalendarPage() {
 
       {adding && (
         <div onClick={() => setAdding(null)} style={{ position: "fixed", inset: 0, background: "rgba(13,21,18,.6)", zIndex: 120, display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}>
-          <div onClick={(e) => e.stopPropagation()} className="panel" style={{ width: 420, maxWidth: "100%", padding: 22, borderTop: "3px solid var(--gold)" }}>
+          <div onClick={(e) => e.stopPropagation()} className="panel glass-panel" style={{ width: 420, maxWidth: "100%", padding: 22, borderTop: "3px solid var(--gold)" }}>
             <h2 style={{ fontSize: 19, marginBottom: 14 }}>Schedule a viewing</h2>
             <div style={{ display: "grid", gap: 12 }}>
               <label style={{ display: "grid", gap: 5 }}>
