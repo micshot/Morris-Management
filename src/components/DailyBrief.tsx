@@ -64,9 +64,47 @@ function since(iso: string) {
   return `${d} days ago`;
 }
 
-export function buildBrief(people: BriefPerson[]): BriefItem[] {
+export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = []): BriefItem[] {
   const items: BriefItem[] = [];
   const leads = people.filter(isIdentified);
+  const claimed = new Set<string>(); // one row per lead: the first rule wins
+
+  const push = (p: BriefPerson, it: Omit<BriefItem, "key">) => {
+    if (claimed.has(p.id)) return;
+    claimed.add(p.id);
+    items.push({ key: `${it.rank}-${p.id}`, ...it });
+  };
+
+  // Rule 2 — verification failed twice and the record was flagged.
+  // Someone tried to reach a lead's data and could not prove who they were.
+  // A human decides what that was.
+  for (const p of leads) {
+    if (p.verificationState !== "FLAGGED") continue;
+    push(p, {
+      rank: 5,
+      icon: "x",
+      title: label(p),
+      reason: "Failed identity verification. Review before sharing anything.",
+      meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
+      href: `/leads?focus=${p.id}`,
+    });
+  }
+
+  // Rule 3 — a viewing they did not turn up to. Rebook or write them off.
+  const byId = new Map(leads.map((p) => [p.id, p]));
+  for (const v of viewings) {
+    if (v.status !== "NO_SHOW") continue;
+    const p = v.person?.id ? byId.get(v.person.id) : undefined;
+    if (!p) continue;
+    push(p, {
+      rank: 8,
+      icon: "clock",
+      title: label(p),
+      reason: `No-show ${since(v.startsAt)}. Rebook or close it out.`,
+      meta: v.property?.title ?? undefined,
+      href: `/leads?focus=${p.id}`,
+    });
+  }
 
   // Rule 1 — hot leads with a phone number and no intro call booked.
   // These are the highest-intent contacts nobody has committed time to yet.
@@ -74,14 +112,46 @@ export function buildBrief(people: BriefPerson[]): BriefItem[] {
     if (p.temperature !== "HOT") continue;
     if (!p.phone || p.phone.trim() === "") continue;
     if ((p.bookings ?? []).some((b) => b.status !== "CANCELLED")) continue;
-    items.push({
-      key: `call-${p.id}`,
+    push(p, {
       rank: 10,
       icon: "flame",
       title: label(p),
       reason: "Hot, no call booked. Worth calling now.",
       meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
       href: `/leads?focus=${p.id}`,
+    });
+  }
+
+  // Rule 4 — live interest that has gone silent. Warm or hotter, nothing on
+  // the timeline for a week, nothing in the diary.
+  const week = Date.now() - 7 * 86400000;
+  for (const p of leads) {
+    if (p.temperature !== "HOT" && p.temperature !== "WARM") continue;
+    if ((p.bookings ?? []).some((b) => b.status !== "CANCELLED")) continue;
+    const last = p.events?.[0]?.createdAt ?? p.lastSeenAt ?? p.createdAt;
+    if (+new Date(last) > week) continue;
+    push(p, {
+      rank: 20,
+      icon: "chat",
+      title: label(p),
+      reason: `${p.temperature === "HOT" ? "Hot" : "Warm"} but quiet since ${since(last)}. Follow up.`,
+      meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
+      href: `/leads?focus=${p.id}`,
+    });
+  }
+
+  // Rule 5 — an anonymous session that talked properly but never gave a name
+  // or a number. One detail short of being a lead.
+  for (const p of people) {
+    if (isIdentified(p)) continue;
+    if ((p.messageCount ?? 0) < 3) continue;
+    push(p, {
+      rank: 30,
+      icon: "users",
+      title: p.location ? `Anonymous · ${p.location}` : "Anonymous conversation",
+      reason: `${p.messageCount} messages, no name or number. One detail short.`,
+      meta: [p.budget, p.lastSeenAt ? `last seen ${since(p.lastSeenAt)}` : null].filter(Boolean).join(" · ") || undefined,
+      href: `/conversations?focus=${p.id}`,
     });
   }
 
@@ -99,7 +169,7 @@ export default function DailyBrief({
   viewings?: BriefViewing[];
   loading: boolean;
 }) {
-  const items = loading ? [] : buildBrief(people);
+  const items = loading ? [] : buildBrief(people, viewings);
   const today = loading ? [] : buildToday(bookings, viewings);
 
   return (
