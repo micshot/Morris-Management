@@ -532,4 +532,3 @@ body > * { position: relative; z-index: 1; }
 @media (max-width: 760px) {
   body::before { background-image: url("/bg-hero-mobile.jpg"); }
 }
-}
