@@ -36,6 +36,19 @@ export default function ConversationsPage() {
   }, []);
   useEffect(() => { load(); }, [load]);
 
+  // Arriving from the daily brief with ?id= opens that session directly.
+  useEffect(() => {
+    if (loading || all.length === 0) return;
+    const id = new URLSearchParams(window.location.search).get("id");
+    if (!id) return;
+    const target = all.find((s) => s.id === id);
+    if (target) {
+      openSession(target);
+      window.history.replaceState({}, "", "/conversations");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, all]);
+
   // Anonymous = no usable name and no phone. These are sessions, not leads.
   const sessions = all
     .filter((p) => !((p.name && p.name.trim() !== "" && p.name !== "New lead") || (p.phone && p.phone.trim() !== "")))

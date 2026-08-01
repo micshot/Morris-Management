@@ -39,6 +39,15 @@ export type BriefViewing = {
   property?: { title: string | null } | null;
 };
 
+export type BriefProperty = {
+  id: string;
+  title: string | null;
+  location: string | null;
+  reviewStatus: "DRAFT" | "LIVE";
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export type BriefItem = {
   key: string;
   rank: number;
@@ -64,7 +73,11 @@ function since(iso: string) {
   return `${d} days ago`;
 }
 
-export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = []): BriefItem[] {
+export function buildBrief(
+  people: BriefPerson[],
+  viewings: BriefViewing[] = [],
+  properties: BriefProperty[] = [],
+): BriefItem[] {
   const items: BriefItem[] = [];
   const leads = people.filter(isIdentified);
   const claimed = new Set<string>(); // one row per lead: the first rule wins
@@ -86,7 +99,7 @@ export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = [])
       title: label(p),
       reason: "Failed identity verification. Review before sharing anything.",
       meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
-      href: `/leads?focus=${p.id}`,
+      href: `/leads?id=${p.id}`,
     });
   }
 
@@ -102,7 +115,7 @@ export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = [])
       title: label(p),
       reason: `No-show ${since(v.startsAt)}. Rebook or close it out.`,
       meta: v.property?.title ?? undefined,
-      href: `/leads?focus=${p.id}`,
+      href: `/leads?id=${p.id}`,
     });
   }
 
@@ -118,7 +131,7 @@ export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = [])
       title: label(p),
       reason: "Hot, no call booked. Worth calling now.",
       meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
-      href: `/leads?focus=${p.id}`,
+      href: `/leads?id=${p.id}`,
     });
   }
 
@@ -136,7 +149,7 @@ export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = [])
       title: label(p),
       reason: `${p.temperature === "HOT" ? "Hot" : "Warm"} but quiet since ${since(last)}. Follow up.`,
       meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
-      href: `/leads?focus=${p.id}`,
+      href: `/leads?id=${p.id}`,
     });
   }
 
@@ -151,7 +164,27 @@ export function buildBrief(people: BriefPerson[], viewings: BriefViewing[] = [])
       title: p.location ? `Anonymous · ${p.location}` : "Anonymous conversation",
       reason: `${p.messageCount} messages, no name or number. One detail short.`,
       meta: [p.budget, p.lastSeenAt ? `last seen ${since(p.lastSeenAt)}` : null].filter(Boolean).join(" · ") || undefined,
-      href: `/conversations?focus=${p.id}`,
+      href: `/conversations?id=${p.id}`,
+    });
+  }
+
+  // Rule 6 — a listing stuck in DRAFT. Buyers cannot see it and the AI will
+  // not mention it, so an unreviewed listing is a listing that does not exist.
+  const threeDays = Date.now() - 3 * 86400000;
+  for (const pr of properties) {
+    if (pr.reviewStatus !== "DRAFT") continue;
+    const born = pr.createdAt ?? pr.updatedAt;
+    if (born && +new Date(born) > threeDays) continue;
+    items.push({
+      key: `draft-${pr.id}`,
+      rank: 15,
+      icon: "home",
+      title: pr.title?.trim() || "Untitled listing",
+      reason: born
+        ? `Still a draft since ${since(born)}. Buyers cannot see it.`
+        : "Still a draft. Buyers cannot see it.",
+      meta: pr.location ?? undefined,
+      href: "/properties",
     });
   }
 
@@ -162,14 +195,16 @@ export default function DailyBrief({
   people,
   bookings = [],
   viewings = [],
+  properties = [],
   loading,
 }: {
   people: BriefPerson[];
   bookings?: BriefBooking[];
   viewings?: BriefViewing[];
+  properties?: BriefProperty[];
   loading: boolean;
 }) {
-  const items = loading ? [] : buildBrief(people, viewings);
+  const items = loading ? [] : buildBrief(people, viewings, properties);
   const today = loading ? [] : buildToday(bookings, viewings);
 
   return (

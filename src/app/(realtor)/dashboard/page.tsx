@@ -5,7 +5,7 @@ import Link from "next/link";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
 import { withSeparators, formatPhone } from "@/lib/format";
-import DailyBrief, { type BriefPerson, type BriefViewing } from "@/components/DailyBrief";
+import DailyBrief, { type BriefPerson, type BriefViewing, type BriefProperty } from "@/components/DailyBrief";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
@@ -17,7 +17,7 @@ type Person = {
 };
 type Booking = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null };
 type Viewing = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null; property: { title: string | null } | null };
-type Property = { id: string; title: string | null; location: string | null; price: string | null; reviewStatus: "DRAFT" | "LIVE" };
+type Property = { id: string; title: string | null; location: string | null; price: string | null; reviewStatus: "DRAFT" | "LIVE"; createdAt?: string; updatedAt?: string };
 
 const pill = (t: string) => `pill pill-${(t || "unset").toLowerCase()}`;
 
@@ -107,6 +107,7 @@ export default function Dashboard() {
         people={people as BriefPerson[]}
         bookings={bookings}
         viewings={viewings as BriefViewing[]}
+        properties={props as BriefProperty[]}
         loading={loading}
       />
 
