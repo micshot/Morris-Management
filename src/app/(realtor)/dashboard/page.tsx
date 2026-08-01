@@ -5,11 +5,15 @@ import Link from "next/link";
 import TempMark from "@/components/TempMark";
 import Icon from "@/components/Icon";
 import { withSeparators, formatPhone } from "@/lib/format";
+import DailyBrief, { type BriefPerson } from "@/components/DailyBrief";
 
 type Person = {
   id: string; name: string | null; phone: string | null; email: string | null;
   role: string; location: string | null; budget: string | null; timeline: string | null;
-  temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string; createdAt: string;
+  temperature: "HOT" | "WARM" | "COLD" | "UNSET"; verificationState?: string | null; createdAt: string;
+  updatedAt?: string; messageCount?: number | null; lastSeenAt?: string | null;
+  bookings?: { id: string; startsAt: string; status: string }[];
+  events?: { id: string; type: string; detail: string | null; createdAt: string }[];
 };
 type Booking = { id: string; startsAt: string; status: string; person: { name: string | null; phone: string | null } | null };
 type Property = { id: string; title: string | null; location: string | null; price: string | null; reviewStatus: "DRAFT" | "LIVE" };
@@ -94,6 +98,8 @@ export default function Dashboard() {
         <Link href="/calendar" className="chip"><Icon name="calendar" size={14} color="var(--gold-soft)" /> Calendar</Link>
         <a href="/chat" target="_blank" rel="noreferrer" className="chip"><Icon name="chat" size={14} color="var(--gold-soft)" /> Preview chat</a>
       </div>
+
+      <DailyBrief people={people as BriefPerson[]} loading={loading} />
 
       <div className="stat-grid" style={{ marginBottom: 26 }}>
         {stats.map((s) => (

@@ -612,3 +612,39 @@ body > * { position: relative; z-index: 1; }
   .lead-card { background: rgba(13, 21, 18, .96); backdrop-filter: none; -webkit-backdrop-filter: none; }
   body::before { opacity: .3; }
 }
+
+/* ── Daily brief ────────────────────────────────────────────────────────────
+   The ranked action list at the top of the dashboard. Rows are solid (no
+   per-row backdrop-filter) because the list can grow long. */
+.brief-count {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px;
+  background: rgba(168,133,50,.16); border: 1px solid rgba(168,133,50,.34);
+  color: var(--gold-soft); font-size: 12px; font-weight: 600;
+}
+.brief-list { display: flex; flex-direction: column; }
+.brief-row {
+  display: flex; align-items: center; gap: 11px;
+  padding: 11px 16px; border-bottom: 1px solid var(--line);
+  text-decoration: none; color: inherit;
+  transition: background .13s ease;
+}
+.brief-row:last-child { border-bottom: none; }
+.brief-row:hover { background: rgba(168,133,50,.07); }
+.brief-icon {
+  flex: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 8px;
+  background: rgba(168,133,50,.14); border: 1px solid rgba(168,133,50,.32);
+  color: var(--gold-soft);
+}
+.brief-body { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.brief-title {
+  font-weight: 600; font-size: 13px; color: var(--forest);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.brief-reason { font-size: 12px; color: var(--gold-soft); }
+.brief-meta {
+  font-size: 12px; opacity: .62;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
