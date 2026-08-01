@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Icon from "@/components/Icon";
+import { withSeparators, formatPhone } from "@/lib/format";
 
 // The daily brief: the dashboard's answer to "what should I do today?".
 // Rules are pure functions over data the dashboard has already fetched.
@@ -64,7 +65,10 @@ export function isIdentified(p: BriefPerson) {
   return named || phoned;
 }
 
-const label = (p: BriefPerson) => p.name?.trim() || p.phone?.trim() || "Unnamed lead";
+// Display only. Never write these back to the record.
+const label = (p: BriefPerson) => p.name?.trim() || formatPhone(p.phone) || "Unnamed lead";
+const facts = (p: BriefPerson) =>
+  [p.location, withSeparators(p.budget)].filter(Boolean).join(" · ") || undefined;
 
 function since(iso: string) {
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
@@ -98,7 +102,7 @@ export function buildBrief(
       icon: "x",
       title: label(p),
       reason: "Failed identity verification. Review before sharing anything.",
-      meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
+      meta: facts(p),
       href: `/leads?id=${p.id}`,
     });
   }
@@ -130,7 +134,7 @@ export function buildBrief(
       icon: "flame",
       title: label(p),
       reason: "Hot, no call booked. Worth calling now.",
-      meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
+      meta: facts(p),
       href: `/leads?id=${p.id}`,
     });
   }
@@ -148,7 +152,7 @@ export function buildBrief(
       icon: "chat",
       title: label(p),
       reason: `${p.temperature === "HOT" ? "Hot" : "Warm"} but quiet since ${since(last)}. Follow up.`,
-      meta: [p.location, p.budget].filter(Boolean).join(" · ") || undefined,
+      meta: facts(p),
       href: `/leads?id=${p.id}`,
     });
   }
@@ -163,7 +167,7 @@ export function buildBrief(
       icon: "users",
       title: p.location ? `Anonymous · ${p.location}` : "Anonymous conversation",
       reason: `${p.messageCount} messages, no name or number. One detail short.`,
-      meta: [p.budget, p.lastSeenAt ? `last seen ${since(p.lastSeenAt)}` : null].filter(Boolean).join(" · ") || undefined,
+      meta: [withSeparators(p.budget), p.lastSeenAt ? `last seen ${since(p.lastSeenAt)}` : null].filter(Boolean).join(" · ") || undefined,
       href: `/conversations?id=${p.id}`,
     });
   }
@@ -280,7 +284,7 @@ export function buildToday(bookings: BriefBooking[], viewings: BriefViewing[]) {
       startsAt: b.startsAt,
       kind: "Intro call",
       icon: "phone",
-      who: b.person?.name?.trim() || b.person?.phone?.trim() || "Unnamed lead",
+      who: b.person?.name?.trim() || formatPhone(b.person?.phone) || "Unnamed lead",
       detail: b.status === "REQUESTED" ? "Not confirmed yet" : null,
       href: "/bookings",
     }));
@@ -292,7 +296,7 @@ export function buildToday(bookings: BriefBooking[], viewings: BriefViewing[]) {
       startsAt: v.startsAt,
       kind: "Viewing",
       icon: "home",
-      who: v.person?.name?.trim() || v.person?.phone?.trim() || "Unnamed lead",
+      who: v.person?.name?.trim() || formatPhone(v.person?.phone) || "Unnamed lead",
       detail: v.property?.title ?? null,
       href: "/calendar",
     }));
