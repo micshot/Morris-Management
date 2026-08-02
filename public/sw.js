@@ -85,3 +85,75 @@ self.addEventListener("fetch", (event) => {
     })(),
   );
 });
+
+/* ── Push ──────────────────────────────────────────────────────────────────
+ * Payloads are small and deliberately vague about buyer data. The push
+ * service is a third party, so the notification says what happened and where
+ * to look, never a lead's phone number or budget. */
+
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { title: "Morris Management", body: event.data ? event.data.text() : "" };
+  }
+
+  const title = data.title || "Morris Management";
+  event.waitUntil(
+    self.registration.showNotification(title, {
+      body: data.body || "",
+      icon: "/logo-180.png",
+      badge: "/logo-64.png",
+      tag: data.tag || "mm",
+      renotify: !!data.tag,
+      data: { url: data.url || "/dashboard" },
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = (event.notification.data && event.notification.data.url) || "/dashboard";
+
+  event.waitUntil(
+    (async () => {
+      const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      // Reuse an open window if there is one; opening a second copy of an
+      // installed app is disorienting.
+      for (const c of all) {
+        if (new URL(c.url).origin === self.location.origin) {
+          await c.focus();
+          if ("navigate" in c) await c.navigate(target).catch(() => undefined);
+          return;
+        }
+      }
+      await self.clients.openWindow(target);
+    })(),
+  );
+});
+
+// The push service can rotate an endpoint under us. Re-subscribe and tell the
+// server, otherwise the device silently stops receiving anything.
+self.addEventListener("pushsubscriptionchange", (event) => {
+  event.waitUntil(
+    (async () => {
+      try {
+        const res = await fetch("/api/push/key");
+        const { enabled, key } = await res.json();
+        if (!enabled || !key) return;
+        const sub = await self.registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: key,
+        });
+        await fetch("/api/push/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sub.toJSON()),
+        });
+      } catch {
+        // Nothing useful to do here; the next app open will re-register.
+      }
+    })(),
+  );
+});

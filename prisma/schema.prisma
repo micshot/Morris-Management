@@ -24,6 +24,7 @@ model Agency {
   properties Property[]
   bookings   Booking[]
   viewings   Viewing[]
+  pushSubs   PushSubscription[]
 
   @@map("agencies")
 }
@@ -47,6 +48,7 @@ model Agent {
   properties Property[]
   bookings   Booking[]
   viewings   Viewing[]
+  pushSubs   PushSubscription[]
 
   @@unique([agencyId, email])
   @@index([agencyId])
@@ -247,4 +249,25 @@ model Viewing {
   @@index([personId])
   @@index([propertyId])
   @@map("viewings")
+}
+
+// A browser push endpoint belonging to one realtor on one device.
+// Created when an installed PWA is granted notification permission, deleted
+// the moment the push service reports it gone (410/404).
+model PushSubscription {
+  id        String   @id @default(cuid())
+  agencyId  String
+  agentId   String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+  lastUsedAt DateTime?
+
+  agency Agency @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agent  Agent  @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([agencyId])
+  @@index([agentId])
 }
