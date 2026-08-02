@@ -99,6 +99,19 @@ ${propertyContext}${verificationNote}`;
     return { error: err instanceof Error ? err.message : "AI error", status: 502 };
   }
 
+  // Notify the desk without ever blocking or breaking the buyer conversation.
+  // No PII in the payload: the push service is a third party.
+  const notify = (title: string, body: string, url: string, tag: string) => {
+    void (async () => {
+      try {
+        const { pushToAgency } = await import("@/lib/push");
+        await pushToAgency(agencyId, { title, body, url, tag });
+      } catch {
+        /* push is never allowed to affect the conversation */
+      }
+    })();
+  };
+
   // Lead capture (best-effort).
   if (conversationId) {
     const full = [...messages, { role: "assistant" as const, content: text }];
@@ -142,6 +155,16 @@ ${propertyContext}${verificationNote}`;
               data: { agencyId, personId: existing.id, type: "discussed", detail: lead.summary },
             });
           }
+          // Fires on the transition only, so a lead that stays hot across a
+          // long conversation does not buzz the desk on every message.
+          if (data.temperature === "HOT" && existing.temperature !== "HOT") {
+            notify(
+              "Hot lead",
+              data.name ? `${data.name} is ready to talk.` : "A buyer is ready to talk.",
+              `/leads?id=${existing.id}`,
+              `lead-${existing.id}`,
+            );
+          }
         } else {
           const created = await prisma.person.create({ data: { agencyId, conversationId, ...data } });
           await prisma.leadEvent.create({
@@ -151,6 +174,14 @@ ${propertyContext}${verificationNote}`;
             await prisma.leadEvent.create({
               data: { agencyId, personId: created.id, type: "discussed", detail: lead.summary },
             });
+          }
+          if (data.temperature === "HOT") {
+            notify(
+              "Hot lead",
+              data.name ? `${data.name} is ready to talk.` : "A buyer is ready to talk.",
+              `/leads?id=${created.id}`,
+              `lead-${created.id}`,
+            );
           }
         }
       }

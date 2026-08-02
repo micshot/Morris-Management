@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import Logo from "@/components/Logo";
 
 type Msg = { role: "user" | "assistant"; content: string };
@@ -62,7 +63,9 @@ export default function ChatPage() {
     <main style={{ maxWidth: 760, margin: "0 auto", padding: "26px 20px", display: "flex", flexDirection: "column", height: "100vh", boxSizing: "border-box" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: "1px solid var(--line-strong)", paddingBottom: 14, marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <Logo size={38} />
+          <Link href="/" aria-label="Morris Management home" style={{ display: "inline-flex" }}>
+            <Logo size={38} />
+          </Link>
           <div>
             <div className="eyebrow">Morris Management</div>
             <h1 style={{ fontSize: 26, marginTop: 3 }}>Property Assistant</h1>

@@ -81,5 +81,25 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // Tell the desk a buyer has asked for time. Fire and forget: a push failure
+  // must never turn a successful booking into an error for the buyer.
+  void (async () => {
+    try {
+      const { pushToAgency } = await import("@/lib/push");
+      const when = startsAt.toLocaleString("en-GB", {
+        weekday: "short", day: "numeric", month: "short",
+        hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jerusalem",
+      });
+      await pushToAgency(agencyId, {
+        title: "New intro call",
+        body: `A buyer requested ${when}. Confirm it.`,
+        url: "/bookings",
+        tag: `booking-${booking.id}`,
+      });
+    } catch {
+      /* never surfaced to the buyer */
+    }
+  })();
+
   return NextResponse.json({ booking }, { status: 201 });
 }
