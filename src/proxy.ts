@@ -3,10 +3,11 @@ import { jwtVerify } from "jose";
 
 // Route protection:
 // - Public: "/" landing, "/chat", "/login", and the buyer + auth APIs.
-// - Realtor-only: "/dashboard", "/leads", "/bookings", "/properties".
+// - Realtor-only: "/dashboard", "/leads", "/conversations", "/bookings",
+//   "/properties", "/calendar".
 // Non-logged-in visitors to a realtor page are redirected to /login.
 
-const REALTOR_PAGES = ["/dashboard", "/leads", "/bookings", "/properties", "/calendar"];
+const REALTOR_PAGES = ["/dashboard", "/leads", "/conversations", "/bookings", "/properties", "/calendar"];
 
 function secret(): Uint8Array {
   const s =
@@ -41,5 +42,12 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/leads/:path*", "/bookings/:path*", "/properties/:path*", "/calendar/:path*"],
+  matcher: [
+    "/dashboard/:path*",
+    "/leads/:path*",
+    "/conversations/:path*",
+    "/bookings/:path*",
+    "/properties/:path*",
+    "/calendar/:path*",
+  ],
 };
