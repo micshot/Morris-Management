@@ -60,7 +60,7 @@ export default function ChatPage() {
   }
 
   return (
-    <main style={{ maxWidth: 760, margin: "0 auto", padding: "26px 20px", display: "flex", flexDirection: "column", height: "100vh", boxSizing: "border-box" }}>
+    <main style={{ maxWidth: 760, margin: "0 auto", padding: "calc(26px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px))", display: "flex", flexDirection: "column", height: "100dvh", boxSizing: "border-box" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", borderBottom: "1px solid var(--line-strong)", paddingBottom: 14, marginBottom: 18 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <Link href="/" aria-label="Morris Management home" style={{ display: "inline-flex" }}>

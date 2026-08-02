@@ -3,7 +3,7 @@ import Logo from "@/components/Logo";
 
 export default function Home() {
   return (
-    <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center" }}>
+    <main style={{ minHeight: "100dvh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "calc(2rem + env(safe-area-inset-top, 0px)) 2rem calc(2rem + env(safe-area-inset-bottom, 0px))", textAlign: "center" }}>
       <Logo size={86} />
       <div className="eyebrow" style={{ margin: "18px 0 10px" }}>Real estate, run by intelligence</div>
       <h1 style={{ fontSize: 52, lineHeight: 1.05, letterSpacing: "-.02em", maxWidth: 560 }}>

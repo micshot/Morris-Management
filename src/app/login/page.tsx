@@ -20,7 +20,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "2rem" }}>
+    <main style={{ minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "calc(2rem + env(safe-area-inset-top, 0px)) 2rem calc(2rem + env(safe-area-inset-bottom, 0px))" }}>
       <div className="panel" style={{ width: "100%", maxWidth: 380, padding: "30px 30px 26px", borderTop: "3px solid var(--gold)" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 14 }}>
           <Logo size={54} />

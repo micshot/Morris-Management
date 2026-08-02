@@ -203,7 +203,7 @@ export default function LeadsPage() {
 
       {open && (
         <div onClick={close} style={{ position: "fixed", inset: 0, background: "rgba(20,35,29,.5)", zIndex: 100, display: "flex", justifyContent: "flex-end" }}>
-          <div onClick={(e) => e.stopPropagation()} className="glass-panel" style={{ width: 460, maxWidth: "100vw", height: "100vh", overflowY: "auto", borderLeft: "1px solid var(--gold)" }}>
+          <div onClick={(e) => e.stopPropagation()} className="glass-panel" style={{ width: 460, maxWidth: "100vw", height: "100dvh", overflowY: "auto", borderLeft: "1px solid var(--gold)", paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)", boxSizing: "border-box" }}>
             <div style={{ padding: "18px 24px 0", background: "rgba(11,18,15,.55)", backdropFilter: "blur(20px) saturate(180%)", WebkitBackdropFilter: "blur(20px) saturate(180%)", position: "sticky", top: 0, zIndex: 1, borderBottom: "1px solid var(--line)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2 style={{ fontSize: 20, display: "flex", alignItems: "center", gap: 8 }}><TempMark temp={open.temperature} size={13} />{open.name ?? "Unnamed lead"}</h2>

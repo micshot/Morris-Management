@@ -221,10 +221,15 @@ input:focus, textarea:focus, select:focus {
 .timeline-when { font-size: 11px; color: var(--muted); margin-top: 1px; }
 
 /* ===== App shell + collapsible icon rail ===== */
-.shell { display: flex; min-height: 100vh; }
+.shell { display: flex; min-height: 100dvh; }
 .rail {
   width: var(--sidebar-w); flex-shrink: 0;
-  position: sticky; top: 0; height: 100vh;
+  position: sticky; top: 0; height: 100dvh;
+  /* Installed on iOS the app runs edge to edge, so the rail has to clear the
+     notch on the left in landscape and the home indicator at the bottom. */
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
   background: var(--glass-bg-chrome);
   -webkit-backdrop-filter: var(--glass-thick);
   backdrop-filter: var(--glass-thick);
@@ -235,7 +240,8 @@ input:focus, textarea:focus, select:focus {
 }
 .rail-brand {
   display: flex; align-items: center; gap: 10px;
-  padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
   min-height: 68px;
 }
 .rail-mark { display: none; }
@@ -259,7 +265,13 @@ input:focus, textarea:focus, select:focus {
 .rail-out { color: #8f9a91; font-size: 12.5px; font-weight: 600; }
 
 .shell-main { flex: 1; min-width: 0; background: transparent; }
-.shell-inner { max-width: 1180px; margin: 0 auto; padding: 28px 32px 64px; }
+.shell-inner {
+  max-width: 1180px; margin: 0 auto;
+  /* Status bar clearance on an installed iOS app; 0 everywhere else. */
+  padding: calc(28px + env(safe-area-inset-top, 0px)) 32px
+           calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-right: calc(32px + env(safe-area-inset-right, 0px));
+}
 
 /* Responsive grids */
 .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
@@ -272,18 +284,26 @@ input:focus, textarea:focus, select:focus {
   .rail-wordmark, .rail-label { display: none; }
   .rail-logo { display: inline-flex; }
   .rail-mark { display: none; }
-  .rail-brand { justify-content: center; padding: 20px 0 16px; }
+  .rail-brand { justify-content: center; padding: calc(20px + env(safe-area-inset-top, 0px)) 0 16px; }
   .rail-nav, .rail-foot { padding: 12px 8px; }
   .rail-link, .rail-out { justify-content: center; gap: 0; padding: 11px 0; border-left: none; }
   .rail-link.is-active { border-left: none; box-shadow: inset 0 0 0 1px rgba(201,168,78,.45); }
-  .shell-inner { padding: 20px 16px 56px; }
+  .shell-inner {
+    padding: calc(20px + env(safe-area-inset-top, 0px)) 16px
+             calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-right: calc(16px + env(safe-area-inset-right, 0px));
+  }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .split-grid { grid-template-columns: 1fr; gap: 18px; }
 }
 
 @media (max-width: 560px) {
   h1 { font-size: 24px !important; }
-  .shell-inner { padding: 16px 12px 48px; }
+  .shell-inner {
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 12px
+             calc(48px + env(safe-area-inset-bottom, 0px));
+    padding-right: calc(12px + env(safe-area-inset-right, 0px));
+  }
   .stat-grid { gap: 10px; }
   .table th, .table td { padding: 9px 10px; font-size: 12.5px; }
   /* Let wide tables scroll instead of squashing */
