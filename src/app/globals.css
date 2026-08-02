@@ -669,3 +669,23 @@ body > * { position: relative; z-index: 1; }
   font-variant-numeric: tabular-nums;
 }
 @media (max-width: 560px) { .brief-time { width: 48px; font-size: 11px; } }
+
+/* Update bar: a new build is live and this tab is running the old one. */
+.update-bar {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 200;
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 10px 9px 16px; border-radius: 14px;
+  background: var(--glass-bg-chrome); backdrop-filter: var(--glass-thick);
+  -webkit-backdrop-filter: var(--glass-thick);
+  border: 1px solid var(--glass-edge); box-shadow: var(--glass-shadow);
+  font-size: 13px; color: var(--text);
+}
+.update-bar .btn { padding: 6px 13px; font-size: 12px; }
+@media (max-width: 480px) {
+  .update-bar { left: 12px; right: 12px; transform: none; justify-content: space-between; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .update-bar { background: var(--surface); }
+}
