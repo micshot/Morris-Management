@@ -732,3 +732,12 @@ body > * { position: relative; z-index: 1; }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .push-prompt { background: var(--surface); }
 }
+
+/* Notifications bell: the second chance after the one-shot install prompt. */
+.rail-bell { width: 100%; background: none; border: none; cursor: pointer; }
+.rail-bell.is-on { color: var(--gold-soft); }
+.rail-note {
+  padding: 2px 12px 8px; margin: 0;
+  font-size: 11.5px; line-height: 1.45; color: var(--gold-soft); opacity: .85;
+}
+@media (max-width: 900px) { .rail-note { display: none; } }

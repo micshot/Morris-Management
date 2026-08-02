@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { fetchVapidKey, isInstalled, pushSupported, subscribe } from "@/lib/pushClient";
 
 /* Asks for notification permission, but only inside an installed PWA.
  *
@@ -9,70 +10,31 @@ import { useCallback, useEffect, useState } from "react";
  * Push API only exists once the app is added to the Home Screen, so prompting
  * in Safari would fail outright.
  *
- * So: detect standalone display mode, confirm the server has VAPID configured,
- * then show a small opt-in. Never auto-request; the browser requires a user
- * gesture and silently ignoring that leaves permission in "default" forever.
+ * Never auto-requests: the browser requires a user gesture, and ignoring that
+ * leaves permission stuck in "default" forever. Anyone who taps "Not now" can
+ * come back via the bell in the sidebar.
  */
-
-function isInstalled() {
-  if (typeof window === "undefined") return false;
-  const standalone = window.matchMedia?.("(display-mode: standalone)").matches;
-  const iosStandalone = (window.navigator as unknown as { standalone?: boolean }).standalone;
-  return !!standalone || !!iosStandalone;
-}
-
-function toUint8(base64: string) {
-  const padded = (base64 + "=".repeat((4 - (base64.length % 4)) % 4))
-    .replace(/-/g, "+")
-    .replace(/_/g, "/");
-  const raw = atob(padded);
-  const out = new Uint8Array(raw.length);
-  for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i);
-  return out;
-}
 
 export default function PushPrompt() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [key, setKey] = useState<string | null>(null);
 
-  // Sends the current subscription up. Runs on every load for an already
-  // granted device, so a wiped database or a rotated endpoint self-heals.
+  // Runs on every load for an already granted device, so a wiped database or
+  // a rotated endpoint self-heals.
   const sync = useCallback(async (vapid: string) => {
-    const reg = await navigator.serviceWorker.ready;
-    let sub = await reg.pushManager.getSubscription();
-    if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: toUint8(vapid),
-      });
-    }
-    await fetch("/api/push/subscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sub.toJSON()),
-    });
+    await subscribe(vapid);
   }, []);
 
   useEffect(() => {
     let dead = false;
 
     (async () => {
-      if (!isInstalled()) return;
-      if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
-      if (typeof Notification === "undefined") return;
+      if (!isInstalled() || !pushSupported()) return;
       if (Notification.permission === "denied") return;
 
-      let vapid: string | null = null;
-      try {
-        const res = await fetch("/api/push/key", { cache: "no-store" });
-        const data = (await res.json()) as { enabled?: boolean; key?: string | null };
-        if (!data.enabled || !data.key) return;
-        vapid = data.key;
-      } catch {
-        return;
-      }
-      if (dead) return;
+      const vapid = await fetchVapidKey();
+      if (!vapid || dead) return;
       setKey(vapid);
 
       if (Notification.permission === "granted") {

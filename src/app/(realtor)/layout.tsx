@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Logo from "@/components/Logo";
 import PushPrompt from "@/components/PushPrompt";
+import NotificationsToggle from "@/components/NotificationsToggle";
 
 const I = (d: string) => (
   <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -54,6 +55,7 @@ export default function RealtorLayout({ children }: { children: React.ReactNode 
         </nav>
 
         <div className="rail-foot">
+          <NotificationsToggle />
           <button onClick={logout} className="rail-out" title="Sign out" aria-label="Sign out">
             <span className="rail-icon">{I("M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9")}</span>
             <span className="rail-label">Sign out</span>
